@@ -73,15 +73,15 @@ public class AuthService {
         }
 
         public AuthResponse register(AuthRequest request) {
-                // Default role is STUDENT
-                Role studentRole = roleRepository.findByRoleName("STUDENT")
+              
+                Role userRole = roleRepository.findByRoleName(request.getRole())
                                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
                 User user = User.builder()
                                 .email(request.getEmail())
                                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                                 .fullName(request.getFullName())
-                                .roles(Set.of(studentRole))
+                                .roles(Set.of(userRole))
                                 .isActive(true)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())

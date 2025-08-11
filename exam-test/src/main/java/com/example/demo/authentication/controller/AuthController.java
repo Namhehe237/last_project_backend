@@ -19,20 +19,13 @@ import com.example.demo.authentication.service.AuthService;
 public class AuthController {
 
     private final AuthService authService;
-   
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         try {
-            System.out.println("Testing AuthService...");
             AuthResponse response = authService.authenticate(request);
-            System.out.println("AuthService success!");
-
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            System.out.println("AuthService Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(
                     AuthResponse.builder()
                             .accessToken("Error: " + e.getMessage())
@@ -45,10 +38,5 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Auth controller is working!";
-    }
 
-   
 }
