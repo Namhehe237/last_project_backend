@@ -1,6 +1,5 @@
-package com.example.demo.authentication.dto.request;
+package com.example.demo.examOnline.dto.request;
 
-import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

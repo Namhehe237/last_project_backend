@@ -1,4 +1,4 @@
-package com.example.demo.authentication.domain;
+package com.example.demo.examOnline.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

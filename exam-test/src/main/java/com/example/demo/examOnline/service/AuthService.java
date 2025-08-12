@@ -1,4 +1,4 @@
-package com.example.demo.authentication.service;
+package com.example.demo.examOnline.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,12 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.authentication.domain.Role;
-import com.example.demo.authentication.domain.User;
-import com.example.demo.authentication.dto.request.AuthRequest;
-import com.example.demo.authentication.dto.response.AuthResponse;
-import com.example.demo.authentication.repository.RoleRepository;
-import com.example.demo.authentication.repository.UserRepository;
+import com.example.demo.examOnline.domain.Role;
+import com.example.demo.examOnline.domain.User;
+import com.example.demo.examOnline.dto.request.AuthRequest;
+import com.example.demo.examOnline.dto.response.AuthResponse;
+import com.example.demo.examOnline.repository.RoleRepository;
+import com.example.demo.examOnline.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Set;

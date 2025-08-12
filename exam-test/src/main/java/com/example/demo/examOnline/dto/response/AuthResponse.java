@@ -1,4 +1,4 @@
-package com.example.demo.authentication.dto.response;
+package com.example.demo.examOnline.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

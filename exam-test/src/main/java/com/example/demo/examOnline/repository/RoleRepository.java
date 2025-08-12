@@ -1,10 +1,10 @@
-package com.example.demo.authentication.repository;
+package com.example.demo.examOnline.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.authentication.domain.Role;
+import com.example.demo.examOnline.domain.Role;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.example.demo.authentication.controller;
+package com.example.demo.examOnline.controller;
 
 import lombok.RequiredArgsConstructor;
 
@@ -8,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.authentication.dto.request.AuthRequest;
-import com.example.demo.authentication.dto.response.AuthResponse;
-import com.example.demo.authentication.service.AuthService;
+import com.example.demo.examOnline.dto.request.AuthRequest;
+import com.example.demo.examOnline.dto.response.AuthResponse;
+import com.example.demo.examOnline.service.AuthService;
+
+
 
 @RestController
 @RequestMapping("/api/auth")

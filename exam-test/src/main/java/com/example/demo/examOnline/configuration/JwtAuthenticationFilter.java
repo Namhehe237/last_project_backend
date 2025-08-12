@@ -1,6 +1,4 @@
-package com.example.demo.authentication.configuration;
-
-
+package com.example.demo.examOnline.configuration;
 
 
 import jakarta.servlet.FilterChain;
@@ -16,8 +14,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.demo.authentication.service.JwtService;
-import com.example.demo.authentication.service.UserService;
+import com.example.demo.examOnline.service.JwtService;
+import com.example.demo.examOnline.service.UserService;
 
 import java.io.IOException;
 
