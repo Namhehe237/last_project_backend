@@ -30,10 +30,6 @@ public class UserService implements UserDetailsService {
 
         List<UserResponseDTO> userList = userRepository.findListStudentByClassId(classId);
 
-        if (userList.isEmpty()){
-            throw new RuntimeException("Lớp học không có học sinh");
-        }
-
         return userList;
     }
 }

@@ -61,37 +61,16 @@ public class TeacherController {
 
     }
 
-    // @PostMapping("delete-student/{classId}")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    // public ResponseEntity<String> deleteStudent(@PathVariable Integer classId,
-    // @RequestBody DeleteStudentRequest deleteStudentRequest) {
-
-    // System.out.println("RequestBody studentIds = " +
-    // deleteStudentRequest.getListStudentId());
-
-    // classService.deleteStudent(classId, deleteStudentRequest.getListStudentId());
-
-    // return ResponseEntity.ok("Xoá thành công");
-    // }
 
     @PostMapping("/delete-student/{classId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<String> deleteStudent(@PathVariable Integer classId,
             @RequestBody DeleteStudentRequest deleteStudentRequest) {
 
-        System.out.println("Class ID: " + classId);
-        System.out.println("DeleteStudentRequest object: " + deleteStudentRequest);
-
-        if (deleteStudentRequest != null) {
-            System.out.println("Student IDs: " + deleteStudentRequest.getListStudentId());
-        }
-
-        // Thêm lại validation
         if (deleteStudentRequest.getListStudentId() == null || deleteStudentRequest.getListStudentId().isEmpty()) {
             return ResponseEntity.badRequest().body("Danh sách studentId không được null hoặc rỗng");
         }
 
-        // Thêm lại logic xử lý
         classService.deleteStudent(classId, deleteStudentRequest.getListStudentId());
 
         return ResponseEntity.ok("Xoá thành công");

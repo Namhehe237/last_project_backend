@@ -27,10 +27,6 @@ public class ClassService {
 
         List<ClassResponseDTO> listClass = classRepository.findClassByTeacherId(teacherId);
 
-        if (listClass.isEmpty()) {
-            throw new RuntimeException("Giáo viên chưa nhận lớp nào");
-        }
-
         return listClass;
 
     }
