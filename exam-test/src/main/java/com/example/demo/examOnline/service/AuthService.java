@@ -84,7 +84,7 @@ public class AuthService {
                                 .phoneNumber(request.getPhoneNumber())
                                 .avatarUrl(request.getAvatarUrl())
                                 .userCode(request.getUserCode())
-                                .roles(Set.of(userRole))
+                                .role(userRole)
                                 .isActive(true)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
