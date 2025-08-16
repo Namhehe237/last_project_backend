@@ -1,6 +1,8 @@
 package com.example.demo.examOnline.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +13,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_email", columnList = "email"),
+    @Index(name = "idx_user_code", columnList = "user_code")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,47 +30,59 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Integer userId;
     
+    @Email
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
     
+    @Size(min = 2, max = 255)
     @Column(name = "full_name", nullable = false)
     private String fullName;
     
+    @Size(max = 20)
     @Column(name = "phone_number")
     private String phoneNumber;
     
     @Column(name = "avatar_url")
     private String avatarUrl;
     
+    @Size(max = 50)
     @Column(name = "user_code", unique = true)
     private String userCode;
     
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+    
+    @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;
     
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
     
     // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
-                .collect(Collectors.toList());
+        return Collections.singletonList(
+            new SimpleGrantedAuthority("ROLE_" + role.getRoleName())
+        );
     }
     
     @Override
@@ -96,6 +112,6 @@ public class User implements UserDetails {
     
     @Override
     public boolean isEnabled() {
-        return isActive;
+        return isActive != null && isActive;
     }
 }
