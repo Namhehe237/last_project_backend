@@ -16,7 +16,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
-
     @Query(
         "SELECT new com.example.demo.examOnline.dto.response.UserResponseDTO ("+
         " s.userId, s.email, s.fullName, s.phoneNumber) "+
