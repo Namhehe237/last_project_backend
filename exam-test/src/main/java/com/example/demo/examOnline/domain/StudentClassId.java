@@ -16,23 +16,24 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExamQuestionId implements Serializable {
-    private Integer examId;
-    private Integer questionId;
+public class StudentClassId implements Serializable {
+    private Integer studentId;
+    private Integer classId;
 
+    // equals & hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ExamQuestionId))
+        if (!(o instanceof StudentClassId))
             return false;
-        ExamQuestionId that = (ExamQuestionId) o;
-        return Objects.equals(examId, that.examId) &&
-                Objects.equals(questionId, that.questionId);
+        StudentClassId that = (StudentClassId) o;
+        return Objects.equals(studentId, that.studentId) &&
+                Objects.equals(classId, that.classId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(examId, questionId);
+        return Objects.hash(studentId, classId);
     }
 }

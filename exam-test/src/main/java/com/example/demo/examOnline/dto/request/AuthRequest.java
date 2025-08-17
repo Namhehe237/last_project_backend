@@ -1,6 +1,8 @@
 package com.example.demo.examOnline.dto.request;
 
 
+import com.example.demo.examOnline.domain.enums.RoleName;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +19,5 @@ public class AuthRequest {
     private String phoneNumber;
     private String avatarUrl;
     private String userCode;
-    private String role;
+    private RoleName role;
 }

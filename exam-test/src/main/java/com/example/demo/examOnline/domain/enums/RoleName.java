@@ -1,6 +1,5 @@
 package com.example.demo.examOnline.domain.enums;
 
-public enum ExamStatus {
-    PUBLISHED,
-    CLOSED
+public enum RoleName {
+    ADMIN, TEACHER, STUDENT
 }

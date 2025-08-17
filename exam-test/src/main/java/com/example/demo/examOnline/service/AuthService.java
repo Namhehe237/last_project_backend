@@ -7,11 +7,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.examOnline.domain.Role;
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.AuthRequest;
 import com.example.demo.examOnline.dto.response.AuthResponse;
-import com.example.demo.examOnline.repository.RoleRepository;
+
 import com.example.demo.examOnline.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -22,7 +21,6 @@ import java.util.Set;
 public class AuthService {
 
         private final UserRepository userRepository;
-        private final RoleRepository roleRepository;
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
         private final AuthenticationManager authenticationManager;
@@ -73,10 +71,7 @@ public class AuthService {
         }
 
         public AuthResponse register(AuthRequest request) {
-              
-                Role userRole = roleRepository.findByRoleName(request.getRole())
-                                .orElseThrow(() -> new RuntimeException("Role not found"));
-
+     
                 User user = User.builder()
                                 .email(request.getEmail())
                                 .passwordHash(passwordEncoder.encode(request.getPassword()))
@@ -84,7 +79,7 @@ public class AuthService {
                                 .phoneNumber(request.getPhoneNumber())
                                 .avatarUrl(request.getAvatarUrl())
                                 .userCode(request.getUserCode())
-                                .role(userRole)
+                                .roleName(request.getRole())
                                 .isActive(true)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())

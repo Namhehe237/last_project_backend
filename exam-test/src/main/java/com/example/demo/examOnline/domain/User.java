@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.example.demo.examOnline.domain.enums.RoleName;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +27,8 @@ import java.util.Collections;
 @AllArgsConstructor
 @Builder
 public class User implements UserDetails {
+
+ 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -52,9 +56,9 @@ public class User implements UserDetails {
     @Column(name = "user_code", unique = true)
     private String userCode;
     
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_name", nullable = false)
+    private RoleName roleName;
     
     @Builder.Default
     @Column(name = "is_active")
@@ -81,7 +85,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + role.getRoleName())
+            new SimpleGrantedAuthority("ROLE_" + roleName.name())
         );
     }
     

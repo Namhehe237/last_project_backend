@@ -1,9 +1,11 @@
 package com.example.demo.examOnline.domain;
 
-
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "SYSTEM_SETTINGS")
@@ -14,9 +16,9 @@ import lombok.*;
 @Builder
 public class SystemSetting {
     @Id
-    @Column(name = "setting_key", length = 255)
     private String settingKey;
 
-    @Column(name = "setting_value", columnDefinition = "TEXT")
+    @Lob
     private String settingValue;
 }
+

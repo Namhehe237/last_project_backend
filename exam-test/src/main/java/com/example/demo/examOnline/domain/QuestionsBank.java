@@ -1,10 +1,14 @@
 package com.example.demo.examOnline.domain;
 
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.demo.examOnline.domain.enums.DifficultyLevel;
 import com.example.demo.examOnline.domain.enums.QuestionType;
@@ -16,43 +20,32 @@ import com.example.demo.examOnline.domain.enums.QuestionType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuestionBank {
+public class QuestionsBank {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")
     private Integer questionId;
 
-    @Column(name = "question_text", nullable = false, columnDefinition = "TEXT")
     private String questionText;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_type", nullable = false)
     private QuestionType questionType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "difficulty_level")
     private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
 
-    @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(name = "audio_url")
     private String audioUrl;
-
-    @Column(name = "video_url")
     private String videoUrl;
+    private String subjectName;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
-
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<Answer> answers;
 }
+

@@ -1,11 +1,11 @@
 package com.example.demo.examOnline.domain;
 
-
-
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "EXAM_QUESTIONS")
@@ -26,11 +26,5 @@ public class ExamQuestion {
     @ManyToOne
     @MapsId("questionId")
     @JoinColumn(name = "question_id")
-    private QuestionBank question;
-
-    @Column(name = "question_order", nullable = false)
-    private Integer questionOrder;
-
-    @Column(name = "score_per_question", precision = 5, scale = 2)
-    private BigDecimal scorePerQuestion = BigDecimal.valueOf(1.00);
+    private QuestionsBank question;
 }

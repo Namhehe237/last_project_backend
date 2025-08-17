@@ -26,10 +26,5 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 
-    public List<UserResponseDTO> getListStudentOfClass(Integer classId){
-
-        List<UserResponseDTO> userList = userRepository.findListStudentByClassId(classId);
-
-        return userList;
-    }
+  
 }

@@ -1,17 +1,19 @@
 package com.example.demo.examOnline.domain;
 
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.demo.examOnline.domain.enums.StudentExamStatus;
 
 @Entity
-@Table(name = "STUDENT_EXAMS",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "exam_id", "attempt_number"}))
+@Table(name = "STUDENT_EXAMS")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,31 +22,24 @@ import com.example.demo.examOnline.domain.enums.StudentExamStatus;
 public class StudentExam {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_exam_id")
     private Integer studentExamId;
 
+    private LocalDateTime startTime;
+    private LocalDateTime submitTime;
+    private Double score;
+    private Integer attemptNumber;
+
+    @Enumerated(EnumType.STRING)
+    private StudentExamStatus status;
+
     @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id")
     private User student;
 
     @ManyToOne
-    @JoinColumn(name = "exam_id", nullable = false)
+    @JoinColumn(name = "exam_id")
     private Exam exam;
 
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
-
-    @Column(name = "submit_time")
-    private LocalDateTime submitTime;
-
-    @Column(name = "score", precision = 5, scale = 2)
-    private BigDecimal score;
-
-    @Column(name = "attempt_number", nullable = false)
-    private Integer attemptNumber = 1;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private StudentExamStatus status = StudentExamStatus.IN_PROGRESS;
+    @OneToMany(mappedBy = "studentExam", cascade = CascadeType.ALL)
+    private List<StudentAnswer> studentAnswers;
 }
-

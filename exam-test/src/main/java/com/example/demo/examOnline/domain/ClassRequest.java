@@ -7,22 +7,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "ANSWERS")
+@Table(name = "CLASS_REQUESTS")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Answer {
+public class ClassRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer answerId;
+    private Integer requestId;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
-    private QuestionsBank question;
+    @JoinColumn(name = "student_id")
+    private User student;
 
-    private String answerText;
-    private Boolean isCorrect;
+    @ManyToOne
+    @JoinColumn(name = "class_id")
+    private Classes classEntity;
+
+    private LocalDateTime requestedAt;
 }

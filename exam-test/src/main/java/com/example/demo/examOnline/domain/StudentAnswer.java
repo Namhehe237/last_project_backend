@@ -1,10 +1,11 @@
 package com.example.demo.examOnline.domain;
 
-
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "STUDENT_ANSWERS")
@@ -16,27 +17,21 @@ import java.math.BigDecimal;
 public class StudentAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_answer_id")
     private Integer studentAnswerId;
 
     @ManyToOne
-    @JoinColumn(name = "student_exam_id", nullable = false)
+    @JoinColumn(name = "student_exam_id")
     private StudentExam studentExam;
 
     @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    private QuestionBank question;
+    @JoinColumn(name = "question_id")
+    private QuestionsBank question;
 
     @ManyToOne
     @JoinColumn(name = "chosen_answer_id")
     private Answer chosenAnswer;
 
-    @Column(name = "essay_answer_text", columnDefinition = "TEXT")
     private String essayAnswerText;
-
-    @Column(name = "is_correct")
     private Boolean isCorrect;
-
-    @Column(name = "score_earned", precision = 5, scale = 2)
-    private BigDecimal scoreEarned;
+    private Double scoreEarned;
 }
