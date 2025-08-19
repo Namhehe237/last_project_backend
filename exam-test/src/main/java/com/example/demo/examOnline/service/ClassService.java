@@ -2,9 +2,14 @@ package com.example.demo.examOnline.service;
 
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
@@ -16,9 +21,27 @@ import lombok.RequiredArgsConstructor;
 public class ClassService {
     private final ClassRepository classRepository;
 
-
-    public ClassResponseDTO getClassInformationDetail(Integer classId){
+    public ClassResponseDTO getClassInformationDetail(Integer classId) {
         return classRepository.getClassInformationDetail(classId);
+    }
+
+    public void updateClassInfomationDetail(Integer classId, UpdateClassInformationRequest request){
+
+        Boolean checkExist = classRepository.checkClassCodeIsExist(request.getClassCode(), classId);
+
+        if (checkExist){
+         throw  new DataIntegrityViolationException("Class code đã có");
+        }
+
+        Classes classes = classRepository.findById(classId)
+        .orElseThrow(() -> new RuntimeException("Không tìm thấy class với id : "+ classId));
+
+
+        if (request.getClassCode() != null) classes.setClassCode(request.getClassCode());
+        if (request.getClassName() != null) classes.setClassName(request.getClassName());
+        if (request.getDescription() != null) classes.setDescription(request.getDescription());
+
+        classRepository.save(classes);
     }
 
     public List<ClassResponseDTO> getClassOfTeacher(Integer teacherId) {
@@ -42,6 +65,4 @@ public class ClassService {
         classRepository.deleteStudentFromClass(classId, request.getListStudentId());
     }
 
-    
-    
 }

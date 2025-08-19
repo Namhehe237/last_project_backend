@@ -1,6 +1,5 @@
 package com.example.demo.examOnline.repository;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +15,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
-    
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE (:email IS NOT NULL AND u.email = :email) AND u.userId <> :userId")
+    Boolean checkEmailIsExist(@Param("userId") Integer userId, @Param("email") String email);
 
 }

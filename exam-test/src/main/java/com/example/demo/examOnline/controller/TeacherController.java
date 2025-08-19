@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
@@ -45,6 +46,16 @@ public class TeacherController {
         return ResponseEntity.ok(classService.getClassInformationDetail(classId));
     }
 
+    @PostMapping("class-detail/update/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> updateClassInformationDetail(@PathVariable Integer classId,
+           @RequestBody UpdateClassInformationRequest request) {
+
+        classService.updateClassInfomationDetail(classId, request);
+
+        return ResponseEntity.ok("Update thông tin thành công");
+    }
+
     @PostMapping("/list-class/{teacherId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId) {
@@ -68,13 +79,8 @@ public class TeacherController {
     public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
             @RequestBody DeleteStudentRequest request) {
 
-        if (request.getListStudentId() == null || request.getListStudentId().isEmpty()) {
-            return ResponseEntity.badRequest().body("Danh sách studentId không được null hoặc rỗng");
-        }
-
-        // Thêm lại logic xử lý
         classService.deleteStudentFromClass(classId, request);
 
-        return null;
+        return ResponseEntity.ok("Xóa student khỏi class thành công");
     }
-}
+}      
