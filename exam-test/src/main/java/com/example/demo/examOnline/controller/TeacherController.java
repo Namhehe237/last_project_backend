@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
@@ -49,7 +50,7 @@ public class TeacherController {
     @PostMapping("class-detail/update/{classId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<String> updateClassInformationDetail(@PathVariable Integer classId,
-           @RequestBody UpdateClassInformationRequest request) {
+            @RequestBody UpdateClassInformationRequest request) {
 
         classService.updateClassInfomationDetail(classId, request);
 
@@ -83,4 +84,17 @@ public class TeacherController {
 
         return ResponseEntity.ok("Xóa student khỏi class thành công");
     }
-}      
+
+    @PostMapping("/request-join-class")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> requestJoinClass(@RequestBody JoinClassRequest request) {
+
+        System.out.println("Received request: " + request);
+        System.out.println("ClassRequestIds: " + request.getClassRequestId());
+        System.out.println("Status: " + request.getStatus());
+
+        classService.handleRequestJoinClass(request);
+
+        return ResponseEntity.ok("Xử lý request thành công");
+    }
+}
