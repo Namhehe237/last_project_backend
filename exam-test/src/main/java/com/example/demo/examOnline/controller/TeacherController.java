@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
+import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
@@ -87,7 +88,7 @@ public class TeacherController {
 
     @PostMapping("/request-join-class")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> requestJoinClass(@RequestBody JoinClassRequest request) {
+    public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
 
         System.out.println("Received request: " + request);
         System.out.println("ClassRequestIds: " + request.getClassRequestId());

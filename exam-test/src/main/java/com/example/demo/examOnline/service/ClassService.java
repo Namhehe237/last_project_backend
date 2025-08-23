@@ -16,6 +16,7 @@ import com.example.demo.examOnline.domain.StudentClassId;
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
+import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
@@ -79,7 +80,7 @@ public class ClassService {
     }
 
     @Transactional
-    public void handleRequestJoinClass(JoinClassRequest request) {
+    public void handleRequestJoinClass(HandleJoinRequestRequest request) {
         try {
             List<ClassRequest> requests = classRequestRepository.findAllById(request.getClassRequestId());
 

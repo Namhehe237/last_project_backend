@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
+    
+    Optional<User> findByUserCode(String userCode);
 
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE (:email IS NOT NULL AND u.email = :email) AND u.userId <> :userId")
     Boolean checkEmailIsExist(@Param("userId") Integer userId, @Param("email") String email);
