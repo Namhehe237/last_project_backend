@@ -1,27 +1,24 @@
 package com.example.demo.examOnline.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
+@Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ClassResponseDTO {
     private Integer classId;
     private String className;
     private String classCode;
     private String description;
     private String teacherName;
-    private String teacherPhoneNumber;
-
-    public ClassResponseDTO(Integer classId, String className, String classCode) {
-        this.classId = classId;
-        this.className = className;
-        this.classCode = classCode;
-    }
-
-    
+    private String teacherEmail;
+    private LocalDateTime createdAt;
+    private LocalDateTime joinedAt; // Thời gian học sinh tham gia lớp
+    private Integer studentCount; // Số lượng học sinh trong lớp
 }
