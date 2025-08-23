@@ -6,6 +6,8 @@ import java.util.List;
 import javax.management.RuntimeErrorException;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,17 +59,15 @@ public class ClassService {
         classRepository.save(classes);
     }
 
-    public List<ClassResponseDTO> getClassOfTeacher(Integer teacherId) {
+    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId,  Pageable pageable) {
 
-        List<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId);
+        Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId,pageable);
 
         return listClasses;
     }
 
-    public List<UserResponseDTO> getStudentOfClass(Integer classId) {
-        List<UserResponseDTO> listStudent = classRepository.findStudentOfClass(classId);
-
-        return listStudent;
+    public Page<UserResponseDTO> getStudentOfClass(Integer classId, Pageable pageable) {
+        return classRepository.findStudentOfClass(classId, pageable);
     }
 
     public void deleteStudentFromClass(Integer classId, DeleteStudentRequest request) {
@@ -92,15 +92,14 @@ public class ClassService {
             } else {
                 List<StudentClass> studentClasses = requests.stream()
                         .map(req -> {
-                          
+
                             StudentClassId id = StudentClassId.builder()
                                     .studentId(req.getStudent().getUserId())
                                     .classId(req.getClassEntity().getClassId())
                                     .build();
 
-                            
                             return StudentClass.builder()
-                                    .id(id) 
+                                    .id(id)
                                     .student(req.getStudent())
                                     .classEntity(req.getClassEntity())
                                     .joinedAt(LocalDateTime.now())
