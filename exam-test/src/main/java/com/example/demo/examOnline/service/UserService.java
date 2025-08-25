@@ -2,8 +2,6 @@ package com.example.demo.examOnline.service;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.UpdateUserInformationRequest;
-import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.UserRepository;
 
 @Service

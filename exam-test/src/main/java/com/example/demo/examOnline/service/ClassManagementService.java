@@ -14,6 +14,9 @@ import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.StudentClassRepository;
 import com.example.demo.examOnline.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -200,7 +203,7 @@ public class ClassManagementService {
     /**
      * Lấy danh sách học sinh trong lớp
      */
-    public List<UserResponseDTO> getClassStudents(Integer classId) {
+    public Page<UserResponseDTO> getClassStudents(Integer classId,Pageable pageable) {
         try {
             User currentStudent = getCurrentStudent();
             
@@ -213,7 +216,7 @@ public class ClassManagementService {
             }
             
             // Lấy danh sách học sinh trong lớp
-            return classRepository.findStudentOfClass(classId);
+            return classRepository.findStudentOfClass(classId,pageable);
             
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi lấy danh sách học sinh: " + e.getMessage());

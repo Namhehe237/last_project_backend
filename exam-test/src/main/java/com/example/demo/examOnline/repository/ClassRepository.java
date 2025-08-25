@@ -3,6 +3,8 @@ package com.example.demo.examOnline.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,11 +23,13 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
                         "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.email, c.createdAt, null, null) FROM Classes c WHERE c.teacher.userId =:teacherId")
-        List<ClassResponseDTO> findClassOfTeacher(@Param("teacherId") Integer teacherId);
+        Page<ClassResponseDTO> findClassOfTeacher(@Param("teacherId") Integer teacherId, Pageable pageable);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.UserResponseDTO(" +
-                        "u.userId, u.email,u.fullName, u.phoneNumber) FROM StudentClass sc JOIN sc.student u WHERE sc.classEntity.classId = :classId")
-        List<UserResponseDTO> findStudentOfClass(@Param("classId") Integer classId);
+                        "u.userId, u.email, u.fullName, u.phoneNumber) " +
+                        "FROM StudentClass sc JOIN sc.student u " +
+                        "WHERE sc.classEntity.classId = :classId")
+        Page<UserResponseDTO> findStudentOfClass(@Param("classId") Integer classId, Pageable pageable);
 
         @Transactional
         @Modifying
@@ -33,11 +37,11 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         void deleteStudentFromClass(@Param("classId") Integer classId, @Param("studentIds") List<Integer> studentIds);
 
         @Query("""
-                SELECT COUNT(c) > 0
-                FROM Classes c
-                WHERE (:classCode IS NOT NULL AND c.classCode = :classCode)
-                AND c.classId <> :classId
-                        """)
+                        SELECT COUNT(c) > 0
+                        FROM Classes c
+                        WHERE (:classCode IS NOT NULL AND c.classCode = :classCode)
+                        AND c.classId <> :classId
+                                """)
         Boolean checkClassCodeIsExist(@Param("classCode") String classCode,
                         @Param("classId") Integer classId);
 

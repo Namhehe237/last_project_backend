@@ -1,6 +1,9 @@
 package com.example.demo.examOnline.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -128,7 +131,7 @@ public class StudentController {
     }
 
     // ==================== QUẢN LÝ LỚP HỌC ====================
-    
+
     // 8. Tham gia lớp học
     @PostMapping("/classes/join")
     @PreAuthorize("hasRole('STUDENT')")
@@ -196,9 +199,11 @@ public class StudentController {
     // 12. Xem danh sách học sinh trong lớp
     @GetMapping("/classes/{classId}/students")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getClassStudents(@PathVariable Integer classId) {
+    public ResponseEntity<?> getClassStudents(@PathVariable Integer classId, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
-            List<UserResponseDTO> students = classManagementService.getClassStudents(classId);
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<UserResponseDTO> students = classManagementService.getClassStudents(classId, pageable);
             return ResponseEntity.ok(students);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
