@@ -1,6 +1,7 @@
 package com.example.demo.examOnline.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +18,11 @@ import com.example.demo.examOnline.dto.response.UserResponseDTO;
 public interface ClassRepository extends JpaRepository<Classes, Integer> {
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
-                        "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.phoneNumber) FROM Classes c WHERE c.classId = :classId ")
+                        "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.email, c.createdAt, null, null) FROM Classes c WHERE c.classId = :classId ")
         ClassResponseDTO getClassInformationDetail(@Param("classId") Integer classId);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
-                        "c.classId, c.className, c.classCode) FROM Classes c WHERE c.teacher.userId =:teacherId")
+                        "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.email, c.createdAt, null, null) FROM Classes c WHERE c.teacher.userId =:teacherId")
         Page<ClassResponseDTO> findClassOfTeacher(@Param("teacherId") Integer teacherId, Pageable pageable);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.UserResponseDTO(" +
@@ -43,5 +44,8 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
                                 """)
         Boolean checkClassCodeIsExist(@Param("classCode") String classCode,
                         @Param("classId") Integer classId);
+
+        // Tìm lớp học theo mã lớp
+        Optional<Classes> findByClassCode(String classCode);
 
 }

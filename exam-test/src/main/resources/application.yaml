@@ -15,7 +15,7 @@ spring:
       roles: ADMIN
   jpa:
     hibernate:
-      ddl-auto: none   # create | update | validate | none
+      ddl-auto: create # create | update | validate | none
     show-sql: true
     properties:
       hibernate:

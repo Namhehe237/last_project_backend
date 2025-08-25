@@ -1,13 +1,18 @@
 package com.example.demo.examOnline.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.AddQuestionRequest;
+import com.example.demo.examOnline.dto.request.getListQuestionRequest;
+import com.example.demo.examOnline.dto.response.QuestionResponse;
 import com.example.demo.examOnline.service.QuestionService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,16 +21,34 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/question")
 @RequiredArgsConstructor
 public class QuestionController {
-    
+
     private final QuestionService questionService;
 
     @PostMapping("/add-question")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> addQuestion(@RequestBody AddQuestionRequest request){
+    public ResponseEntity<String> addQuestion(@RequestBody AddQuestionRequest request) {
 
         questionService.addQuestion(request);
 
         return ResponseEntity.ok("Thêm câu hỏi thành công");
-    } 
+    }
+
+    @PostMapping("/list-question")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<Page<QuestionResponse>> listQuestion(
+            @RequestBody getListQuestionRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageRequest pageable = PageRequest.of(page, size);
+
+        Page<QuestionResponse> result = questionService.getQuestionsByFilters(
+                request.getDifficultyLevel(),
+                request.getSubjectName(),
+                request.getTeacherName(), // ở đây bạn filter theo teacherName (String)
+                pageable);
+
+        return ResponseEntity.ok(result);
+    }
 
 }
