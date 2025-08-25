@@ -151,4 +151,10 @@ public class QuestionService {
 
         questionRepository.save(questionsBank);
     }
+
+    @Transactional
+    public void deleteQuestions(List<Integer> questionIds) {
+        questionRepository.deleteByIds(questionIds);
+    }
+
 }
