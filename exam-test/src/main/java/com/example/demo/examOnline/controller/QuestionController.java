@@ -1,9 +1,12 @@
 package com.example.demo.examOnline.controller;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.AddQuestionRequest;
+import com.example.demo.examOnline.dto.request.DeleteQuestionRequest;
 import com.example.demo.examOnline.dto.request.getListQuestionRequest;
 import com.example.demo.examOnline.dto.response.QuestionResponse;
 import com.example.demo.examOnline.service.QuestionService;
@@ -45,10 +49,26 @@ public class QuestionController {
         Page<QuestionResponse> result = questionService.getQuestionsByFilters(
                 request.getDifficultyLevel(),
                 request.getSubjectName(),
-                request.getTeacherName(), // ở đây bạn filter theo teacherName (String)
+                request.getTeacherName(),
                 pageable);
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/update/{questionId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> updateQuestion(@PathVariable Integer questionId,
+            @RequestBody AddQuestionRequest request) {
+        questionService.updateQuestionWithFetch(questionId, request);
+
+        return ResponseEntity.ok("Update câu hỏi thành công");
+    }
+
+    @DeleteMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> deleteQuestions(@RequestBody DeleteQuestionRequest request) {
+        questionService.deleteQuestions(request.getQuestionId());
+        return ResponseEntity.ok("Deleted successfully");
     }
 
 }

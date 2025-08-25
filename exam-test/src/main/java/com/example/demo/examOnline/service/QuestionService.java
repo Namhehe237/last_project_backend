@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.examOnline.domain.Answer;
 import com.example.demo.examOnline.domain.QuestionsBank;
@@ -76,29 +78,83 @@ public class QuestionService {
             String subject,
             String teacherName,
             Pageable pageable) {
-        Page<Object[]> rows = questionRepository.findQuestionsByFilters(level, subject, teacherName, pageable);
+        Page<QuestionsBank> questionsPage = questionRepository.findQuestionsByFiltersWithAnswers(
+                level, subject, teacherName, pageable);
 
-        Map<Integer, QuestionResponse> map = new LinkedHashMap<>();
+        List<QuestionResponse> responses = questionsPage.getContent().stream()
+                .map(question -> {
+                    List<AnswerResponse> answers = question.getAnswers().stream()
+                            .map(answer -> new AnswerResponse(answer.getAnswerText(), answer.getIsCorrect()))
+                            .collect(Collectors.toList());
 
-        for (Object[] row : rows) {
-            Integer qId = (Integer) row[0];
-            map.putIfAbsent(qId, new QuestionResponse(
-                    (String) row[1], // questionText
-                    (QuestionType) row[2], // questionType
-                    (DifficultyLevel) row[3], // difficultyLevel
-                    (String) row[4], // subjectName
-                    (String) row[5], // teacherName
-                    new ArrayList<>() // answers
-            ));
+                    return new QuestionResponse(
+                            question.getQuestionText(),
+                            question.getQuestionType(),
+                            question.getDifficultyLevel(),
+                            question.getSubjectName(),
+                            question.getTeacher() != null ? question.getTeacher().getFullName() : null,
+                            answers);
+                })
+                .collect(Collectors.toList());
 
-            String answerText = (String) row[6];
-            Boolean isCorrect = (Boolean) row[7];
-            if (answerText != null) {
-                map.get(qId).getAnswers().add(new AnswerResponse(answerText, isCorrect));
+        return new PageImpl<>(responses, pageable, questionsPage.getTotalElements());
+    }
+
+    @Transactional
+    public void updateQuestionWithFetch(Integer questionId, AddQuestionRequest request) {
+        // First get question with answers loaded
+        QuestionsBank questionsBank = questionRepository.findByIdWithAnswers(questionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy câu hỏi"));
+
+        Boolean checkQuestion = questionRepository.existsByQuestionTextAndNotId(request.getQuestionText(), questionId);
+
+        if (checkQuestion) {
+            throw new IllegalArgumentException("Câu hỏi đã tồn tại trong ngân hàng câu hỏi!");
+        }
+
+        // Update basic fields
+        if (request.getQuestionText() != null) {
+            questionsBank.setQuestionText(request.getQuestionText());
+        }
+        if (request.getQuestionType() != null) {
+            questionsBank.setQuestionType(request.getQuestionType());
+        }
+        if (request.getDifficultyLevel() != null) {
+            questionsBank.setDifficultyLevel(request.getDifficultyLevel());
+        }
+        if (request.getSubjectName() != null) {
+            questionsBank.setSubjectName(request.getSubjectName());
+        }
+        if (request.getTeacherId() != null) {
+            User teacher = userRepository.findById(request.getTeacherId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy giáo viên"));
+            questionsBank.setTeacher(teacher);
+        }
+
+        // Handle answers update
+        if (request.getAnswer() != null && !request.getAnswer().isEmpty()) {
+            // Clear existing answers (orphanRemoval will delete from DB)
+            questionsBank.getAnswers().clear();
+
+            // Create and add new answers
+            for (int i = 0; i < request.getAnswer().size(); i++) {
+                boolean isCorrect = (i == 0);
+                Answer answer = Answer.builder()
+                        .question(questionsBank)
+                        .answerText(request.getAnswer().get(i))
+                        .isCorrect(isCorrect)
+                        .build();
+
+                questionsBank.getAnswers().add(answer);
             }
         }
 
-        return new PageImpl<>(new ArrayList<>(map.values()), pageable, rows.getTotalElements());
+        questionRepository.save(questionsBank);
+    }
+
+    @Transactional
+    public void deleteQuestions(List<Integer> questionIds) {
+        questionRepository.deleteByIds(questionIds);
     }
 
 }
