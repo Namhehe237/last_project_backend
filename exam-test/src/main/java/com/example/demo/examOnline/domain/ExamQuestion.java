@@ -27,4 +27,13 @@ public class ExamQuestion {
     @MapsId("questionId")
     @JoinColumn(name = "question_id")
     private QuestionsBank question;
+
+    public ExamQuestion(Exam exam, QuestionsBank question) {
+        this.exam = exam;
+        this.question = question;
+        this.id = ExamQuestionId.builder()
+                .examId(exam.getExamId())
+                .questionId(question.getQuestionId())
+                .build();
+    }
 }
