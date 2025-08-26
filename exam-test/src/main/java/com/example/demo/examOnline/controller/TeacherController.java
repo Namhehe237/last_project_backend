@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.Classes;
-import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
@@ -91,7 +91,7 @@ public class TeacherController {
     @PostMapping("/remove-student/{classId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
-            @RequestBody DeleteStudentRequest request) {
+            @RequestBody DeleteUserRequest request) {
 
         classService.deleteStudentFromClass(classId, request);
 
@@ -101,10 +101,6 @@ public class TeacherController {
     @PostMapping("/request-join-class")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
-
-        System.out.println("Received request: " + request);
-        System.out.println("ClassRequestIds: " + request.getClassRequestId());
-        System.out.println("Status: " + request.getStatus());
 
         classService.handleRequestJoinClass(request);
 

@@ -16,7 +16,7 @@ import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.domain.StudentClass;
 import com.example.demo.examOnline.domain.StudentClassId;
 import com.example.demo.examOnline.domain.User;
-import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
@@ -71,12 +71,12 @@ public class ClassService {
         return classRepository.findStudentOfClass(classId, pageable);
     }
 
-    public void deleteStudentFromClass(Integer classId, DeleteStudentRequest request) {
-        if (request.getListStudentId() == null || request.getListStudentId().isEmpty()) {
+    public void deleteStudentFromClass(Integer classId, DeleteUserRequest request) {
+        if (request.getListUserId() == null || request.getListUserId().isEmpty()) {
             throw new IllegalArgumentException("Danh sách studentId không được null hoặc rỗng");
         }
 
-        classRepository.deleteStudentFromClass(classId, request.getListStudentId());
+        classRepository.deleteStudentFromClass(classId, request.getListUserId());
     }
 
     @Transactional
