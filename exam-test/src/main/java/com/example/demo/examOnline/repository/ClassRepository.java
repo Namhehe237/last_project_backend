@@ -48,4 +48,5 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         // Tìm lớp học theo mã lớp
         Optional<Classes> findByClassCode(String classCode);
 
+        Optional<Classes> findByClassName(String className);
 }
