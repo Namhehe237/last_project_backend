@@ -13,7 +13,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteStudentRequest {
-    @JsonProperty("listStudentId")
-    private List<Integer> listStudentId;
+public class DeleteUserRequest {
+    private List<Integer> listUserId;
 }

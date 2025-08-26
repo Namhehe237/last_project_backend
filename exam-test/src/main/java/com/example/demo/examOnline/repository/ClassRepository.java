@@ -45,6 +45,12 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         Boolean checkClassCodeIsExist(@Param("classCode") String classCode,
                         @Param("classId") Integer classId);
 
+        @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
+                        "c.classId, c.className, c.classCode, c.description, " +
+                        "c.teacher.fullName, c.teacher.email, c.createdAt) " +
+                        "FROM Classes c")
+        Page<ClassResponseDTO> getListClass(Pageable pageable);
+
         // Tìm lớp học theo mã lớp
         Optional<Classes> findByClassCode(String classCode);
 
