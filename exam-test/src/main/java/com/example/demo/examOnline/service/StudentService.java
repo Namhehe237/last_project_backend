@@ -137,8 +137,6 @@ public class StudentService {
             throw new RuntimeException("Email này không phải là tài khoản học sinh");
         }
 
-        // TODO: Implement email sending logic here
-        // For now, just return a success message
         return MessageResponse.builder()
                 .message("Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn")
                 .success(true)

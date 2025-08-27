@@ -51,6 +51,12 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
                         "FROM Classes c")
         Page<ClassResponseDTO> getListClass(Pageable pageable);
 
+
+        @Transactional
+        @Modifying
+        @Query("DELETE FROM Classes c WHERE c.classId IN :classIds")
+        void deleteClass(@Param("classIds") List<Integer> classIds);
+        
         // Tìm lớp học theo mã lớp
         Optional<Classes> findByClassCode(String classCode);
 

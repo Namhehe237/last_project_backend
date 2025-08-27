@@ -46,21 +46,6 @@ public class TeacherController {
         return "Manage Grades - ADMIN and TEACHER can access";
     }
 
-    @PostMapping("/class-detail/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<ClassResponseDTO> getClassInformationDetail(@PathVariable Integer classId) {
-        return ResponseEntity.ok(classService.getClassInformationDetail(classId));
-    }
-
-    @PostMapping("class-detail/update/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> updateClassInformationDetail(@PathVariable Integer classId,
-            @RequestBody UpdateClassInformationRequest request) {
-
-        classService.updateClassInfomationDetail(classId, request);
-
-        return ResponseEntity.ok("Update thông tin thành công");
-    }
 
     @PostMapping("/list-class/{teacherId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
@@ -106,4 +91,5 @@ public class TeacherController {
 
         return ResponseEntity.ok("Xử lý request thành công");
     }
+
 }
