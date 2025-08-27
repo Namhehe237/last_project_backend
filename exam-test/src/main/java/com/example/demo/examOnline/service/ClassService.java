@@ -2,6 +2,7 @@ package com.example.demo.examOnline.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import javax.management.RuntimeErrorException;
 
@@ -16,6 +17,8 @@ import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.domain.StudentClass;
 import com.example.demo.examOnline.domain.StudentClassId;
 import com.example.demo.examOnline.domain.User;
+import com.example.demo.examOnline.dto.request.CreateClassRequest;
+import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
@@ -25,6 +28,7 @@ import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ClassRequestRepository;
 import com.example.demo.examOnline.repository.StudentClassRepository;
+import com.example.demo.examOnline.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +38,7 @@ public class ClassService {
     private final ClassRepository classRepository;
     private final ClassRequestRepository classRequestRepository;
     private final StudentClassRepository studentClassRepository;
+    private final UserRepository userRepository;
 
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
         return classRepository.getClassInformationDetail(classId);
@@ -60,9 +65,9 @@ public class ClassService {
         classRepository.save(classes);
     }
 
-    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId,  Pageable pageable) {
+    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId, Pageable pageable) {
 
-        Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId,pageable);
+        Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId, pageable);
 
         return listClasses;
     }
@@ -119,4 +124,33 @@ public class ClassService {
         }
     }
 
+    public void createClass(CreateClassRequest request) {
+        User teacher = userRepository.findByFullName(request.getTeacherName())
+                .orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy giáo viên với tên: " + request.getTeacherName()));
+        
+        
+
+        UUID generatedUuid = UUID.randomUUID();
+        String uuidStr = generatedUuid.toString().replace("-", "").substring(0, 8);
+       
+        Classes newClass = Classes.builder()
+                .className(request.getClassName())
+                .description(request.getDescription())
+                .teacher(teacher)
+                .classCode(uuidStr)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        classRepository.save(newClass);
+    }
+
+    public void deleteClass(DeleteClassRequest request){
+        if (request.getClassId() == null || request.getClassId().isEmpty()) {
+            throw new IllegalArgumentException("Danh sách classId không được null hoặc rỗng");
+        }
+
+        classRepository.deleteClass(request.getClassId());
+    }
 }
