@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.Classes;
-import com.example.demo.examOnline.dto.request.DeleteStudentRequest;
+import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
@@ -46,21 +46,6 @@ public class TeacherController {
         return "Manage Grades - ADMIN and TEACHER can access";
     }
 
-    @PostMapping("/class-detail/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<ClassResponseDTO> getClassInformationDetail(@PathVariable Integer classId) {
-        return ResponseEntity.ok(classService.getClassInformationDetail(classId));
-    }
-
-    @PostMapping("class-detail/update/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> updateClassInformationDetail(@PathVariable Integer classId,
-            @RequestBody UpdateClassInformationRequest request) {
-
-        classService.updateClassInfomationDetail(classId, request);
-
-        return ResponseEntity.ok("Update thông tin thành công");
-    }
 
     @PostMapping("/list-class/{teacherId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
@@ -88,26 +73,5 @@ public class TeacherController {
         return ResponseEntity.ok(listStudent);
     }
 
-    @PostMapping("/remove-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
-            @RequestBody DeleteStudentRequest request) {
 
-        classService.deleteStudentFromClass(classId, request);
-
-        return ResponseEntity.ok("Xóa student khỏi class thành công");
-    }
-
-    @PostMapping("/request-join-class")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
-
-        System.out.println("Received request: " + request);
-        System.out.println("ClassRequestIds: " + request.getClassRequestId());
-        System.out.println("Status: " + request.getStatus());
-
-        classService.handleRequestJoinClass(request);
-
-        return ResponseEntity.ok("Xử lý request thành công");
-    }
 }

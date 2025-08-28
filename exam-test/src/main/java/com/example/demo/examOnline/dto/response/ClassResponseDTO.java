@@ -21,4 +21,17 @@ public class ClassResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime joinedAt; // Thời gian học sinh tham gia lớp
     private Integer studentCount; // Số lượng học sinh trong lớp
+
+    public ClassResponseDTO(Integer classId, String className, String classCode, String description, String teacherName,
+            String teacherEmail, LocalDateTime createdAt) {
+        this.classId = classId;
+        this.className = className;
+        this.classCode = classCode;
+        this.description = description;
+        this.teacherName = teacherName;
+        this.teacherEmail = teacherEmail;
+        this.createdAt = createdAt;
+ 
+    }
+
 }

@@ -15,6 +15,7 @@ import com.example.demo.examOnline.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -71,14 +72,17 @@ public class AuthService {
         }
 
         public AuthResponse register(AuthRequest request) {
-     
+                UUID generatedUuid = UUID.randomUUID();
+                String uuidStr = generatedUuid.toString().replace("-", "").substring(0, 8);
+                uuidStr = "USER" + uuidStr;
+
                 User user = User.builder()
                                 .email(request.getEmail())
                                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                                 .fullName(request.getFullName())
                                 .phoneNumber(request.getPhoneNumber())
                                 .avatarUrl(request.getAvatarUrl())
-                                .userCode(request.getUserCode())
+                                .userCode(uuidStr)
                                 .roleName(request.getRole())
                                 .isActive(true)
                                 .createdAt(LocalDateTime.now())
