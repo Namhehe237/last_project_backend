@@ -18,6 +18,5 @@ public class AuthRequest {
     private String fullName;
     private String phoneNumber;
     private String avatarUrl;
-    private String userCode;
     private RoleName role;
 }

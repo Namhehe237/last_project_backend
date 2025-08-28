@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.examOnline.dto.request.CreateUserRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.GetUserListRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -70,4 +71,12 @@ public class AdminController {
         return ResponseEntity.ok("Xoá User thành công");
     }
 
+    @PostMapping("/add-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> addUser(@RequestBody CreateUserRequest request) {
+        adminService.addUser(request);
+        return ResponseEntity.ok("Thêm User thành công");
+    }
+
+    
 }
