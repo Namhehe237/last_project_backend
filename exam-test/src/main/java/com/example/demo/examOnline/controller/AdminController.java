@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.examOnline.dto.request.CreateUserRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.GetUserListRequest;
+import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.service.AdminService;
+import com.example.demo.examOnline.service.ClassService;
 import com.example.demo.examOnline.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class AdminController {
 
     private final UserService userService;
     private final AdminService adminService;
+    private final ClassService classService;
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,5 +82,22 @@ public class AdminController {
         return ResponseEntity.ok("Thêm User thành công");
     }
 
-    
+    @PostMapping("/remove-student/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
+            @RequestBody DeleteUserRequest request) {
+
+        classService.deleteStudentFromClass(classId, request);
+
+        return ResponseEntity.ok("Xóa student khỏi class thành công");
+    }
+
+    @PostMapping("/request-join-class")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
+
+        classService.handleRequestJoinClass(request);
+
+        return ResponseEntity.ok("Xử lý request thành công");
+    }
 }
