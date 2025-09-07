@@ -92,12 +92,12 @@ public class AdminController {
         return ResponseEntity.ok("Xóa student khỏi class thành công");
     }
 
-    @PostMapping("/request-join-class")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
+    // @PostMapping("/request-join-class")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    // public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
 
-        classService.handleRequestJoinClass(request);
+    //     classService.handleRequestJoinClass(request);
 
-        return ResponseEntity.ok("Xử lý request thành công");
-    }
+    //     return ResponseEntity.ok("Xử lý request thành công");
+    // }
 }
