@@ -24,6 +24,7 @@ import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
+import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ClassRequestRepository;
@@ -70,6 +71,13 @@ public class ClassService {
         Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId, pageable);
 
         return listClasses;
+    }
+
+    public Page<RequestJoinClassResponse> getRequestOfClass(Integer classId, Pageable pageable){
+
+        Page<RequestJoinClassResponse> listRequest = classRequestRepository.getRequestOfClass(classId, pageable);
+
+        return listRequest;
     }
 
     public Page<UserResponseDTO> getStudentOfClass(Integer classId, Pageable pageable) {
@@ -153,4 +161,6 @@ public class ClassService {
 
         classRepository.deleteClass(request.getClassId());
     }
+
+
 }
