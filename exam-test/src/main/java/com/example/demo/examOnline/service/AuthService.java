@@ -62,6 +62,7 @@ public class AuthService {
 
                         return AuthResponse.builder()
                                         .accessToken(jwtToken)
+                                        .roleName(user.getRoleName())
                                         .build();
 
                 } catch (Exception e) {
