@@ -34,18 +34,6 @@ public class AdminController {
     private final AdminService adminService;
     private final ClassService classService;
 
-    @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminDashboard() {
-        return "Admin Dashboard - Only ADMIN can access";
-    }
-
-    @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String manageUsers() {
-        return "Manage Users - Only ADMIN can access";
-    }
-
     @PostMapping("/list-user")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponseDTO>> getListUser(@RequestBody GetUserListRequest request,

@@ -34,19 +34,6 @@ public class TeacherController {
 
     private final ClassService classService;
 
-    @GetMapping("/courses")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public String manageCourses() {
-        return "Manage Courses - ADMIN and TEACHER can access";
-    }
-
-    @GetMapping("/grades")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public String manageGrades() {
-        return "Manage Grades - ADMIN and TEACHER can access";
-    }
-
-
     @PostMapping("/list-class/{teacherId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
@@ -55,7 +42,7 @@ public class TeacherController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId,pageable);
+        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
 
         return ResponseEntity.ok(listClasses);
     }
@@ -72,6 +59,5 @@ public class TeacherController {
 
         return ResponseEntity.ok(listStudent);
     }
-
 
 }
