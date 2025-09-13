@@ -56,4 +56,9 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public User getUserInformationDetail(Integer userId){
+        return userRepository.findById(userId)
+        .orElseThrow(() -> new RuntimeException("Không có user này"));
+    }
+    
 }
