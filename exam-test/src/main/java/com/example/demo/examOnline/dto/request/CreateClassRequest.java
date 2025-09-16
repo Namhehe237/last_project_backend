@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateClassRequest {
+    private Integer teacherId;
     private String className;
     private String description;
-    private String teacherName;
 }
