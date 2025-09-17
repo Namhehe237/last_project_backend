@@ -18,6 +18,7 @@ import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
+import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.service.ClassService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,15 @@ public class ClassController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(classService.getRequestOfClass(classId, pageable));
+    }
+
+    @PostMapping("/class-detail/list-student/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<Page<UserResponseDTO>> getStudentOfClass(@PathVariable Integer classId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(classService.getStudentOfClass(classId, pageable));
     }
 
     @PostMapping("/class-detail/{classId}")
@@ -76,4 +86,5 @@ public class ClassController {
 
         return ResponseEntity.ok("Xử lý request thành công");
     }
+
 }
