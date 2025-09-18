@@ -70,14 +70,4 @@ public class AdminController {
         return ResponseEntity.ok("Thêm User thành công");
     }
 
-    @PostMapping("/remove-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
-            @RequestBody DeleteUserRequest request) {
-
-        classService.deleteStudentFromClass(classId, request);
-
-        return ResponseEntity.ok("Xóa student khỏi class thành công");
-    }
-
 }

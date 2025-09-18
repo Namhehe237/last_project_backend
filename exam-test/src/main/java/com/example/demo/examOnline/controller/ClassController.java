@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
+import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -85,6 +86,29 @@ public class ClassController {
         classService.handleRequestJoinClass(request);
 
         return ResponseEntity.ok("Xử lý request thành công");
+    }
+
+    @PostMapping("/list-class/{teacherId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
+
+        return ResponseEntity.ok(listClasses);
+    }
+
+    @PostMapping("/remove-student/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
+            @RequestBody DeleteUserRequest request) {
+
+        classService.deleteStudentFromClass(classId, request);
+
+        return ResponseEntity.ok("Xóa student khỏi class thành công");
     }
 
 }

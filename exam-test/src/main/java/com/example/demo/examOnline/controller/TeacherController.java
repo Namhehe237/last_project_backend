@@ -34,30 +34,5 @@ public class TeacherController {
 
     private final ClassService classService;
 
-    @PostMapping("/list-class/{teacherId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
-
-        return ResponseEntity.ok(listClasses);
-    }
-
-    @PostMapping("/list-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<Page<UserResponseDTO>> getListStudentOfClass(
-            @PathVariable Integer classId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserResponseDTO> listStudent = classService.getStudentOfClass(classId, pageable);
-
-        return ResponseEntity.ok(listStudent);
-    }
 
 }
