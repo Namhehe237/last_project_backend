@@ -37,7 +37,7 @@ public class AdminController {
     @PostMapping("/list-user")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponseDTO>> getListUser(@RequestBody GetUserListRequest request,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(adminService.getUserList(request, pageable));
@@ -70,22 +70,4 @@ public class AdminController {
         return ResponseEntity.ok("Thêm User thành công");
     }
 
-    @PostMapping("/remove-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
-            @RequestBody DeleteUserRequest request) {
-
-        classService.deleteStudentFromClass(classId, request);
-
-        return ResponseEntity.ok("Xóa student khỏi class thành công");
-    }
-
-    // @PostMapping("/request-join-class")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    // public ResponseEntity<String> requestJoinClass(@RequestBody HandleJoinRequestRequest request) {
-
-    //     classService.handleRequestJoinClass(request);
-
-    //     return ResponseEntity.ok("Xử lý request thành công");
-    // }
 }
