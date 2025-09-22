@@ -43,6 +43,10 @@ public class ClassService {
     private final UserRepository userRepository;
 
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
+
+        Classes classes = classRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Không có thông tin về lớp học này"));
+
         return classRepository.getClassInformationDetail(classId);
     }
 
