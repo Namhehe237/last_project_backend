@@ -12,7 +12,7 @@ import com.example.demo.examOnline.dto.request.student.ChangePasswordRequest;
 import com.example.demo.examOnline.dto.request.student.ForgotPasswordRequest;
 import com.example.demo.examOnline.dto.request.student.StudentRegisterRequest;
 import com.example.demo.examOnline.dto.request.student.UpdateStudentProfileRequest;
-import com.example.demo.examOnline.dto.request.JoinClassRequest;
+import com.example.demo.examOnline.dto.request.RequestJoinClassRequest;
 import com.example.demo.examOnline.dto.response.AuthResponse;
 import com.example.demo.examOnline.dto.response.MessageResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -132,17 +132,17 @@ public class StudentController {
 
     // ==================== QUẢN LÝ LỚP HỌC ====================
 
-    // 8. Tham gia lớp học
-    @PostMapping("/classes/join")
+    // 8. Gửi yêu cầu tham gia lớp học (cần phê duyệt)
+    @PostMapping("/classes/request-join")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<MessageResponse> joinClass(@Valid @RequestBody JoinClassRequest request) {
+    public ResponseEntity<MessageResponse> requestJoinClass(@Valid @RequestBody RequestJoinClassRequest request) {
         try {
-            MessageResponse response = classManagementService.joinClass(request);
+            MessageResponse response = classManagementService.requestJoinClass(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                     MessageResponse.builder()
-                            .message("Tham gia lớp học thất bại: " + e.getMessage())
+                            .message("Gửi yêu cầu tham gia lớp học thất bại: " + e.getMessage())
                             .success(false)
                             .build());
         }

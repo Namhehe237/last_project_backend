@@ -1,16 +1,17 @@
 package com.example.demo.examOnline.service;
 
 import com.example.demo.examOnline.domain.Classes;
+import com.example.demo.examOnline.domain.ClassRequest;
 import com.example.demo.examOnline.domain.StudentClass;
-import com.example.demo.examOnline.domain.StudentClassId;
 import com.example.demo.examOnline.domain.User;
-import com.example.demo.examOnline.dto.request.JoinClassRequest;
+import com.example.demo.examOnline.dto.request.RequestJoinClassRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.MessageResponse;
 import com.example.demo.examOnline.dto.response.AssignmentResponseDTO;
 import com.example.demo.examOnline.dto.response.AnnouncementResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
+import com.example.demo.examOnline.repository.ClassRequestRepository;
 import com.example.demo.examOnline.repository.StudentClassRepository;
 import com.example.demo.examOnline.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +33,16 @@ import java.util.stream.Collectors;
 public class ClassManagementService {
 
     private final ClassRepository classRepository;
+    private final ClassRequestRepository classRequestRepository;
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
 
+
     /**
-     * Tham gia lớp học bằng mã lớp
+     * Gửi request tham gia lớp học (cần phê duyệt từ giáo viên)
      */
     @Transactional
-    public MessageResponse joinClass(JoinClassRequest request) {
+    public MessageResponse requestJoinClass(RequestJoinClassRequest request) {
         try {
             // Lấy thông tin học sinh hiện tại
             User currentStudent = getCurrentStudent();
@@ -66,29 +69,34 @@ public class ClassManagementService {
                         .build();
             }
             
-            // Tạo enrollment mới
-            StudentClassId studentClassId = StudentClassId.builder()
-                    .studentId(currentStudent.getUserId())
-                    .classId(classEntity.getClassId())
-                    .build();
+            // Kiểm tra đã có request chưa được xử lý chưa
+            Optional<ClassRequest> existingRequest = classRequestRepository
+                    .findByStudentAndClassEntity(currentStudent, classEntity);
             
-            StudentClass studentClass = StudentClass.builder()
-                    .id(studentClassId)
+            if (existingRequest.isPresent()) {
+                return MessageResponse.builder()
+                        .message("Bạn đã gửi yêu cầu tham gia lớp học này rồi, vui lòng đợi giáo viên phê duyệt")
+                        .success(false)
+                        .build();
+            }
+            
+            // Tạo request mới
+            ClassRequest classRequest = ClassRequest.builder()
                     .student(currentStudent)
                     .classEntity(classEntity)
-                    .joinedAt(LocalDateTime.now())
+                    .requestedAt(LocalDateTime.now())
                     .build();
             
-            studentClassRepository.save(studentClass);
+            classRequestRepository.save(classRequest);
             
             return MessageResponse.builder()
-                    .message("Tham gia lớp học thành công: " + classEntity.getClassName())
+                    .message("Đã gửi yêu cầu tham gia lớp học: " + classEntity.getClassName() + ". Vui lòng đợi giáo viên phê duyệt.")
                     .success(true)
                     .build();
                     
         } catch (Exception e) {
             return MessageResponse.builder()
-                    .message("Tham gia lớp học thất bại: " + e.getMessage())
+                    .message("Gửi yêu cầu tham gia lớp học thất bại: " + e.getMessage())
                     .success(false)
                     .build();
         }

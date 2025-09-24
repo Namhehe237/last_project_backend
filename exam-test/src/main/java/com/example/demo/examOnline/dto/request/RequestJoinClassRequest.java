@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinClassRequest {
+public class RequestJoinClassRequest {
     
     @NotBlank(message = "Mã lớp không được để trống")
     private String classCode;
