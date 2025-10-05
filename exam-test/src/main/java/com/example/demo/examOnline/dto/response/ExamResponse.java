@@ -34,4 +34,14 @@ public class ExamResponse {
         this.questionId = null;
     }
 
+    public ExamResponse(Integer examId, String examName, String subjectName, Integer durationMinutes, String className,
+            String teacherName) {
+        this.examId = examId;
+        this.examName = examName;
+        this.subjectName = subjectName;
+        this.durationMinutes = durationMinutes;
+        this.className = className;
+        this.teacherName = teacherName;
+    }
+
 }

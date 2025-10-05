@@ -1,5 +1,8 @@
 package com.example.demo.examOnline.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -7,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
@@ -42,5 +46,14 @@ public class ExamController {
     public ResponseEntity<ExamResponse> getExamDetail(@PathVariable Integer examId) {
         ExamResponse examResponse = examService.getExamDetail(examId);
         return ResponseEntity.ok(examResponse);
+    }
+
+    @PostMapping("/get-all-exam")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
+    public ResponseEntity<Page<ExamResponse>> getAllExamTest(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(examService.getListExam(pageable));
     }
 }

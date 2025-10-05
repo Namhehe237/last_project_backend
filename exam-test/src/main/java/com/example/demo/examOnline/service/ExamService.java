@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.examOnline.domain.Classes;
@@ -71,19 +73,23 @@ public class ExamService {
 
         }
 
-        public void deleteExam(Integer examId){
+        public void deleteExam(Integer examId) {
                 Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Không có lớp này"));
+                                .orElseThrow(() -> new RuntimeException("Không có lớp này"));
 
                 examRepository.delete(exam);
         }
 
-        public ExamResponse getExamDetail(Integer examId){
+        public ExamResponse getExamDetail(Integer examId) {
 
                 ExamResponse examResponse = examRepository.getExamDetail(examId);
                 examResponse.setQuestionId(examQuestionRepository.getExamQuestion(examId));
 
                 return examResponse;
 
+        }
+
+        public Page<ExamResponse> getListExam(Pageable pageable) {
+                return examRepository.getListExam(pageable);
         }
 }
