@@ -12,6 +12,7 @@ import com.example.demo.examOnline.domain.ExamQuestion;
 import com.example.demo.examOnline.domain.QuestionsBank;
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ExamQuestionRepository;
 import com.example.demo.examOnline.repository.ExamRepository;
@@ -75,5 +76,14 @@ public class ExamService {
                 .orElseThrow(() -> new RuntimeException("Không có lớp này"));
 
                 examRepository.delete(exam);
+        }
+
+        public ExamResponse getExamDetail(Integer examId){
+
+                ExamResponse examResponse = examRepository.getExamDetail(examId);
+                examResponse.setQuestionId(examQuestionRepository.getExamQuestion(examId));
+
+                return examResponse;
+
         }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.service.ExamService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,12 @@ public class ExamController {
     public ResponseEntity<String> deleteExam(@PathVariable Integer examId) {
         examService.deleteExam(examId);
         return ResponseEntity.ok("Huỷ bài kiểm tra thành công");
+    }
+
+    @PostMapping("/get-exam-details/{examId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
+    public ResponseEntity<ExamResponse> getExamDetail(@PathVariable Integer examId) {
+        ExamResponse examResponse = examService.getExamDetail(examId);
+        return ResponseEntity.ok(examResponse);
     }
 }
