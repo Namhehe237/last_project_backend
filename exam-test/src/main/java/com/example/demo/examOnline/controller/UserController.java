@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.request.UpdateUserInformationRequest;
 import com.example.demo.examOnline.service.UserService;
@@ -24,5 +25,10 @@ public class UserController {
         userService.updateUserInformation(userId, request);
 
         return ResponseEntity.ok("Update thông tin thành công");
+    }
+
+    @PostMapping("/user-info/{userId}")
+    public ResponseEntity<User> getUserInformationDetails(@PathVariable Integer userId){
+        return ResponseEntity.ok(userService.getUserInformationDetail(userId));
     }
 }

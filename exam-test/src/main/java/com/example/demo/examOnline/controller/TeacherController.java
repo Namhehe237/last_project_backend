@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
-import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -33,45 +32,6 @@ import lombok.RequiredArgsConstructor;
 public class TeacherController {
 
     private final ClassService classService;
-
-    @GetMapping("/courses")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public String manageCourses() {
-        return "Manage Courses - ADMIN and TEACHER can access";
-    }
-
-    @GetMapping("/grades")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public String manageGrades() {
-        return "Manage Grades - ADMIN and TEACHER can access";
-    }
-
-
-    @PostMapping("/list-class/{teacherId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId,pageable);
-
-        return ResponseEntity.ok(listClasses);
-    }
-
-    @PostMapping("/list-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<Page<UserResponseDTO>> getListStudentOfClass(
-            @PathVariable Integer classId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserResponseDTO> listStudent = classService.getStudentOfClass(classId, pageable);
-
-        return ResponseEntity.ok(listStudent);
-    }
 
 
 }

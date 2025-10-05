@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
+import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
+import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.service.ClassService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,15 @@ public class ClassController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(classService.getRequestOfClass(classId, pageable));
+    }
+
+    @PostMapping("/class-detail/list-student/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<Page<UserResponseDTO>> getStudentOfClass(@PathVariable Integer classId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(classService.getStudentOfClass(classId, pageable));
     }
 
     @PostMapping("/class-detail/{classId}")
@@ -76,4 +87,28 @@ public class ClassController {
 
         return ResponseEntity.ok("Xử lý request thành công");
     }
+
+    @PostMapping("/list-class/{teacherId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
+
+        return ResponseEntity.ok(listClasses);
+    }
+
+    @PostMapping("/remove-student/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> deleteStudentFromClass(@PathVariable Integer classId,
+            @RequestBody DeleteUserRequest request) {
+
+        classService.deleteStudentFromClass(classId, request);
+
+        return ResponseEntity.ok("Xóa student khỏi class thành công");
+    }
+
 }

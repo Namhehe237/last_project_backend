@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
-    avatar_url VARCHAR(500),
+    avatar_url MEDIUMTEXT,
     user_code VARCHAR(50) UNIQUE,
     role_name ENUM('ADMIN', 'TEACHER', 'STUDENT') NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,

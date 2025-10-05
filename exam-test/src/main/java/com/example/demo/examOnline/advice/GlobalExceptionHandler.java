@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.demo.examOnline.advice.customException.UnauthorizedActionException;
 import com.example.demo.examOnline.dto.response.ErrorResponse;
 import com.example.demo.examOnline.dto.response.MessageResponse;
 
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        
+
         return ResponseEntity
                 .badRequest()
                 .body(MessageResponse.builder()
@@ -56,5 +57,14 @@ public class GlobalExceptionHandler {
                         .success(false)
                         .build());
     }
-}
 
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<?> handleUnauthorizedActionException(UnauthorizedActionException ex) {
+        return ResponseEntity
+                .status(403) 
+                .body(MessageResponse.builder()
+                        .message(ex.getMessage())
+                        .success(false)
+                        .build());
+    }
+}

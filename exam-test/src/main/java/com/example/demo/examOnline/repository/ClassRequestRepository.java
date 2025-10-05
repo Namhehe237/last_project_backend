@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.demo.examOnline.domain.ClassRequest;
 import com.example.demo.examOnline.domain.Classes;
+import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 
 public interface ClassRequestRepository extends JpaRepository<ClassRequest, Integer> {
@@ -19,4 +20,7 @@ public interface ClassRequestRepository extends JpaRepository<ClassRequest, Inte
             "FROM ClassRequest cr " +
             "WHERE cr.classEntity.classId = :classId")
     Page<RequestJoinClassResponse> getRequestOfClass(@Param("classId") Integer classId, Pageable pageable);
+    
+    // Tìm request theo student và class
+    Optional<ClassRequest> findByStudentAndClassEntity(User student, Classes classEntity);
 }

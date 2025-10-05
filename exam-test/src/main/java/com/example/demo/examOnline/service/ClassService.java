@@ -17,10 +17,10 @@ import com.example.demo.examOnline.domain.Classes;
 import com.example.demo.examOnline.domain.StudentClass;
 import com.example.demo.examOnline.domain.StudentClassId;
 import com.example.demo.examOnline.domain.User;
+import com.example.demo.examOnline.domain.enums.RoleName;
 import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
-import com.example.demo.examOnline.dto.request.JoinClassRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -42,6 +42,10 @@ public class ClassService {
     private final UserRepository userRepository;
 
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
+
+        Classes classes = classRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Không có thông tin về lớp học này"));
+
         return classRepository.getClassInformationDetail(classId);
     }
 
@@ -73,7 +77,7 @@ public class ClassService {
         return listClasses;
     }
 
-    public Page<RequestJoinClassResponse> getRequestOfClass(Integer classId, Pageable pageable){
+    public Page<RequestJoinClassResponse> getRequestOfClass(Integer classId, Pageable pageable) {
 
         Page<RequestJoinClassResponse> listRequest = classRequestRepository.getRequestOfClass(classId, pageable);
 
@@ -133,19 +137,21 @@ public class ClassService {
     }
 
     public void createClass(CreateClassRequest request) {
-        User teacher = userRepository.findByFullName(request.getTeacherName())
+        User user = userRepository.findById(request.getTeacherId())
                 .orElseThrow(
-                        () -> new RuntimeException("Không tìm thấy giáo viên với tên: " + request.getTeacherName()));
-        
-        
+                        () -> new RuntimeException("Không tìm thấy giáo viên id: " + request.getTeacherId()));
+
+        if (user.getRoleName() != RoleName.TEACHER) {
+            throw new RuntimeException("Người dùng này không phải giáo viên");
+        }
 
         UUID generatedUuid = UUID.randomUUID();
         String uuidStr = generatedUuid.toString().replace("-", "").substring(0, 8);
-       
+
         Classes newClass = Classes.builder()
                 .className(request.getClassName())
                 .description(request.getDescription())
-                .teacher(teacher)
+                .teacher(user)
                 .classCode(uuidStr)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -154,13 +160,12 @@ public class ClassService {
         classRepository.save(newClass);
     }
 
-    public void deleteClass(DeleteClassRequest request){
+    public void deleteClass(DeleteClassRequest request) {
         if (request.getClassId() == null || request.getClassId().isEmpty()) {
             throw new IllegalArgumentException("Danh sách classId không được null hoặc rỗng");
         }
 
         classRepository.deleteClass(request.getClassId());
     }
-
 
 }
