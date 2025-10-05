@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.service.ExamService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,11 @@ public class ExamController {
 
     @PostMapping("/create-exam")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> createExam(@RequestBody CreateExamRequest request) {
+    public ResponseEntity<ExamResponse> createExam(@RequestBody CreateExamRequest request) {
 
-        examService.createExam(request);
+        ExamResponse response = examService.createExam(request);
 
-        return ResponseEntity.ok("Thêm bài kiểm tra thành công");
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete-exam/{examId}")

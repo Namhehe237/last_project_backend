@@ -1,4 +1,4 @@
-package com.example.demo.examOnline.dto.request;
+package com.example.demo.examOnline.dto.request.student;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,11 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestJoinClassRequest {
-    
-    @NotNull(message = "Student ID không được để trống")
-    private Integer studentId;
-    
+public class GetClassStudentsRequest {
     @NotNull(message = "Class ID không được để trống")
     private Integer classId;
+    
+    private Integer page = 0;
+    private Integer size = 10;
 }

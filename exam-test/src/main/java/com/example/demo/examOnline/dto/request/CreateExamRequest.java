@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.examOnline.domain.enums.ExamStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +17,10 @@ public class CreateExamRequest {
     private Integer durationMinutes;
     private Integer maxAttempts;
     private String className;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    
+    private LocalDateTime startTime; // Optional - có thể null
+    private LocalDateTime endTime; // Optional - có thể null
+    
     private ExamStatus examStatus;
     private String teacherName;
     private List<Integer> questionId;
