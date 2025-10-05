@@ -9,17 +9,12 @@ import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.MessageResponse;
 import com.example.demo.examOnline.dto.response.AssignmentResponseDTO;
 import com.example.demo.examOnline.dto.response.AnnouncementResponseDTO;
-import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ClassRequestRepository;
 import com.example.demo.examOnline.repository.StudentClassRepository;
 import com.example.demo.examOnline.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,14 +39,15 @@ public class ClassManagementService {
     @Transactional
     public MessageResponse requestJoinClass(RequestJoinClassRequest request) {
         try {
-            // Lấy thông tin học sinh hiện tại
-            User currentStudent = getCurrentStudent();
+            // Lấy thông tin học sinh từ request (cần thêm studentId vào RequestJoinClassRequest)
+            User currentStudent = userRepository.findById(request.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + request.getStudentId()));
             
-            // Tìm lớp học theo mã lớp
-            Optional<Classes> classOptional = classRepository.findByClassCode(request.getClassCode());
+            // Tìm lớp học theo classId
+            Optional<Classes> classOptional = classRepository.findById(request.getClassId());
             if (classOptional.isEmpty()) {
                 return MessageResponse.builder()
-                        .message("Mã lớp không tồn tại")
+                        .message("Lớp học không tồn tại")
                         .success(false)
                         .build();
             }
@@ -102,14 +98,19 @@ public class ClassManagementService {
         }
     }
 
+
     /**
-     * Lấy danh sách lớp học mà học sinh đã tham gia
+     * Lấy danh sách lớp học của học sinh theo studentId
      */
-    public List<ClassResponseDTO> getStudentClasses() {
+    public List<ClassResponseDTO> getStudentClasses(Integer studentId) {
         try {
-            User currentStudent = getCurrentStudent();
+            // Kiểm tra studentId có tồn tại không
+            Optional<User> student = userRepository.findById(studentId);
+            if (student.isEmpty()) {
+                throw new RuntimeException("Không tìm thấy học sinh với ID: " + studentId);
+            }
             
-            List<StudentClass> studentClasses = studentClassRepository.findByStudentId(currentStudent.getUserId());
+            List<StudentClass> studentClasses = studentClassRepository.findByStudentId(studentId);
             
             return studentClasses.stream()
                     .map(this::convertToClassResponseDTO)
@@ -124,9 +125,10 @@ public class ClassManagementService {
      * Rời khỏi lớp học
      */
     @Transactional
-    public MessageResponse leaveClass(Integer classId) {
+    public MessageResponse leaveClass(Integer studentId, Integer classId) {
         try {
-            User currentStudent = getCurrentStudent();
+            User currentStudent = userRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + studentId));
             
             // Kiểm tra học sinh có tham gia lớp này không
             Optional<StudentClass> enrollment = studentClassRepository
@@ -158,9 +160,10 @@ public class ClassManagementService {
     /**
      * Lấy thông tin chi tiết một lớp học
      */
-    public ClassResponseDTO getClassDetails(Integer classId) {
+    public ClassResponseDTO getClassDetails(Integer studentId, Integer classId) {
         try {
-            User currentStudent = getCurrentStudent();
+            User currentStudent = userRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + studentId));
             
             // Kiểm tra học sinh có tham gia lớp này không
             Optional<StudentClass> enrollment = studentClassRepository
@@ -197,46 +200,14 @@ public class ClassManagementService {
                 .build();
     }
 
-    /**
-     * Lấy thông tin học sinh hiện tại
-     */
-    private User getCurrentStudent() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin học sinh"));
-    }
-
-    /**
-     * Lấy danh sách học sinh trong lớp
-     */
-    public Page<UserResponseDTO> getClassStudents(Integer classId,Pageable pageable) {
-        try {
-            User currentStudent = getCurrentStudent();
-            
-            // Kiểm tra học sinh có tham gia lớp này không
-            Optional<StudentClass> enrollment = studentClassRepository
-                    .findByStudentIdAndClassId(currentStudent.getUserId(), classId);
-            
-            if (enrollment.isEmpty()) {
-                throw new RuntimeException("Bạn chưa tham gia lớp học này");
-            }
-            
-            // Lấy danh sách học sinh trong lớp
-            return classRepository.findStudentOfClass(classId,pageable);
-            
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi lấy danh sách học sinh: " + e.getMessage());
-        }
-    }
 
     /**
      * Lấy danh sách bài tập trong lớp (mock data cho demo)
      */
-    public List<AssignmentResponseDTO> getClassAssignments(Integer classId) {
+    public List<AssignmentResponseDTO> getClassAssignments(Integer studentId, Integer classId) {
         try {
-            User currentStudent = getCurrentStudent();
+            User currentStudent = userRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + studentId));
             
             // Kiểm tra học sinh có tham gia lớp này không
             Optional<StudentClass> enrollment = studentClassRepository
@@ -280,9 +251,10 @@ public class ClassManagementService {
     /**
      * Lấy bảng tin lớp học (mock data cho demo)
      */
-    public List<AnnouncementResponseDTO> getClassAnnouncements(Integer classId) {
+    public List<AnnouncementResponseDTO> getClassAnnouncements(Integer studentId, Integer classId) {
         try {
-            User currentStudent = getCurrentStudent();
+            User currentStudent = userRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + studentId));
             
             // Kiểm tra học sinh có tham gia lớp này không
             Optional<StudentClass> enrollment = studentClassRepository

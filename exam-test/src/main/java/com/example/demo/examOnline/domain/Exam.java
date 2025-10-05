@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.examOnline.domain.enums.ExamStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "EXAMS")
@@ -28,8 +29,13 @@ public class Exam {
     private String subjectName;
     private Integer durationMinutes;
     private Double totalScore;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endTime;
+    
     private Boolean shuffleQuestions;
     private Boolean shuffleAnswers;
     private Integer maxAttempts;
@@ -37,7 +43,10 @@ public class Exam {
     @Enumerated(EnumType.STRING)
     private ExamStatus status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
     @ManyToOne

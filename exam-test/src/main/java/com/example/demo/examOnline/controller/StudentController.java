@@ -2,24 +2,20 @@ package com.example.demo.examOnline.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.examOnline.dto.request.student.ChangePasswordRequest;
-import com.example.demo.examOnline.dto.request.student.ForgotPasswordRequest;
-import com.example.demo.examOnline.dto.request.student.StudentRegisterRequest;
-import com.example.demo.examOnline.dto.request.student.UpdateStudentProfileRequest;
+import com.example.demo.examOnline.dto.request.student.GetStudentClassesRequest;
+import com.example.demo.examOnline.dto.request.student.GetClassDetailsRequest;
+import com.example.demo.examOnline.dto.request.student.GetClassAssignmentsRequest;
+import com.example.demo.examOnline.dto.request.student.GetClassAnnouncementsRequest;
+import com.example.demo.examOnline.dto.request.student.LeaveClassRequest;
 import com.example.demo.examOnline.dto.request.RequestJoinClassRequest;
-import com.example.demo.examOnline.dto.response.AuthResponse;
 import com.example.demo.examOnline.dto.response.MessageResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
-import com.example.demo.examOnline.dto.response.student.StudentProfileResponse;
 import com.example.demo.examOnline.service.StudentService;
 import com.example.demo.examOnline.service.ClassManagementService;
-import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.dto.response.AssignmentResponseDTO;
 import com.example.demo.examOnline.dto.response.AnnouncementResponseDTO;
 
@@ -35,23 +31,8 @@ public class StudentController {
     private final StudentService studentService;
     private final ClassManagementService classManagementService;
 
-    // 1. Đăng ký tài khoản mới
-    @PostMapping("/register")
-    public ResponseEntity<?> registerStudent(@Valid @RequestBody StudentRegisterRequest request) {
-        try {
-            AuthResponse response = studentService.registerStudent(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Đăng ký thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
 
-    // 2. Đăng nhập (sử dụng AuthController hiện có)
-    // 3. Đăng xuất
+    //  Đăng xuất
     @PostMapping("/logout")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<MessageResponse> logout() {
@@ -67,72 +48,11 @@ public class StudentController {
         }
     }
 
-    // 4. Quên mật khẩu
-    @PostMapping("/forgot-password")
-    public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        try {
-            MessageResponse response = studentService.forgotPassword(request.getEmail());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Yêu cầu quên mật khẩu thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
 
-    // 5. Đổi mật khẩu
-    @PostMapping("/change-password")
-    @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        try {
-            MessageResponse response = studentService.changePassword(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Đổi mật khẩu thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
-
-    // 6. Xem thông tin cá nhân
-    @GetMapping("/profile")
-    @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getProfile() {
-        try {
-            StudentProfileResponse response = studentService.getCurrentStudentProfile();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy thông tin thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
-
-    // 7. Cập nhật thông tin cá nhân
-    @PutMapping("/profile")
-    @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateStudentProfileRequest request) {
-        try {
-            StudentProfileResponse response = studentService.updateStudentProfile(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Cập nhật thông tin thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
 
     // ==================== QUẢN LÝ LỚP HỌC ====================
 
-    // 8. Gửi yêu cầu tham gia lớp học (cần phê duyệt)
+    //  Gửi yêu cầu tham gia lớp học (cần phê duyệt) - sử dụng classId
     @PostMapping("/classes/request-join")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<MessageResponse> requestJoinClass(@Valid @RequestBody RequestJoinClassRequest request) {
@@ -149,43 +69,35 @@ public class StudentController {
     }
 
     // 9. Xem danh sách lớp học đã tham gia
-    @GetMapping("/classes")
+    @PostMapping("/classes")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getMyClasses() {
+    public ResponseEntity<List<ClassResponseDTO>> getMyClasses(@Valid @RequestBody GetStudentClassesRequest request) {
         try {
-            List<ClassResponseDTO> classes = classManagementService.getStudentClasses();
+            List<ClassResponseDTO> classes = classManagementService.getStudentClasses(request.getStudentId());
             return ResponseEntity.ok(classes);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy danh sách lớp học thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     // 10. Xem chi tiết lớp học
-    @GetMapping("/classes/{classId}")
+    @PostMapping("/classes/details")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getClassDetails(@PathVariable Integer classId) {
+    public ResponseEntity<ClassResponseDTO> getClassDetails(@Valid @RequestBody GetClassDetailsRequest request) {
         try {
-            ClassResponseDTO classDetails = classManagementService.getClassDetails(classId);
+            ClassResponseDTO classDetails = classManagementService.getClassDetails(request.getStudentId(), request.getClassId());
             return ResponseEntity.ok(classDetails);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy thông tin lớp học thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     // 11. Rời khỏi lớp học
-    @DeleteMapping("/classes/{classId}/leave")
+    @PostMapping("/classes/leave")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<MessageResponse> leaveClass(@PathVariable Integer classId) {
+    public ResponseEntity<MessageResponse> leaveClass(@Valid @RequestBody LeaveClassRequest request) {
         try {
-            MessageResponse response = classManagementService.leaveClass(classId);
+            MessageResponse response = classManagementService.leaveClass(request.getStudentId(), request.getClassId());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
@@ -196,66 +108,42 @@ public class StudentController {
         }
     }
 
-    // 12. Xem danh sách học sinh trong lớp
-    @GetMapping("/classes/{classId}/students")
-    @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getClassStudents(@PathVariable Integer classId, @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        try {
-            PageRequest pageable = PageRequest.of(page, size);
-            Page<UserResponseDTO> students = classManagementService.getClassStudents(classId, pageable);
-            return ResponseEntity.ok(students);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy danh sách học sinh thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
-        }
-    }
 
     // 13. Xem danh sách bài tập trong lớp
-    @GetMapping("/classes/{classId}/assignments")
+    @PostMapping("/classes/assignments")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getClassAssignments(@PathVariable Integer classId) {
+    public ResponseEntity<List<AssignmentResponseDTO>> getClassAssignments(@Valid @RequestBody GetClassAssignmentsRequest request) {
         try {
-            List<AssignmentResponseDTO> assignments = classManagementService.getClassAssignments(classId);
+            List<AssignmentResponseDTO> assignments = classManagementService.getClassAssignments(request.getStudentId(), request.getClassId());
             return ResponseEntity.ok(assignments);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy danh sách bài tập thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     // 14. Xem bảng tin lớp học
-    @GetMapping("/classes/{classId}/announcements")
+    @PostMapping("/classes/announcements")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<?> getClassAnnouncements(@PathVariable Integer classId) {
+    public ResponseEntity<List<AnnouncementResponseDTO>> getClassAnnouncements(@Valid @RequestBody GetClassAnnouncementsRequest request) {
         try {
-            List<AnnouncementResponseDTO> announcements = classManagementService.getClassAnnouncements(classId);
+            List<AnnouncementResponseDTO> announcements = classManagementService.getClassAnnouncements(request.getStudentId(), request.getClassId());
             return ResponseEntity.ok(announcements);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    MessageResponse.builder()
-                            .message("Lấy bảng tin thất bại: " + e.getMessage())
-                            .success(false)
-                            .build());
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    // Các API hiện có
+    // ==================== API KHÁC ====================
+    
     @GetMapping("/courses")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
-    public String viewCourses() {
-        return "View Courses - All authenticated users can access";
+    public ResponseEntity<String> viewCourses() {
+        return ResponseEntity.ok("View Courses - All authenticated users can access");
     }
 
     @GetMapping("/grades")
     @PreAuthorize("hasRole('STUDENT')")
-    public String viewOwnGrades() {
-        return "View Own Grades - Only STUDENT can access";
+    public ResponseEntity<String> viewOwnGrades() {
+        return ResponseEntity.ok("View Own Grades - Only STUDENT can access");
     }
 }

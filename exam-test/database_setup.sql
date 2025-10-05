@@ -33,15 +33,6 @@ CREATE TABLE IF NOT EXISTS classes (
     FOREIGN KEY (teacher_id) REFERENCES users(user_id)
 );
 
--- Tạo bảng student_class
-CREATE TABLE IF NOT EXISTS student_class (
-    student_id INT,
-    class_id INT,
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (student_id, class_id),
-    FOREIGN KEY (student_id) REFERENCES users(user_id),
-    FOREIGN KEY (class_id) REFERENCES classes(class_id)
-);
 
 -- Tạo bảng class_requests
 CREATE TABLE IF NOT EXISTS class_requests (
