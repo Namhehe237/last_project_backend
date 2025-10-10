@@ -88,6 +88,7 @@ public class QuestionService {
                             .collect(Collectors.toList());
 
                     return new QuestionResponse(
+                            question.getQuestionId(),
                             question.getQuestionText(),
                             question.getQuestionType(),
                             question.getDifficultyLevel(),

@@ -1,5 +1,7 @@
 package com.example.demo.examOnline.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,14 +23,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/update-info/{userId}")
-    public ResponseEntity<String> updateUserInformation(@PathVariable Integer userId,@RequestBody UpdateUserInformationRequest request){
+    public ResponseEntity<String> updateUserInformation(@PathVariable Integer userId,
+            @RequestBody UpdateUserInformationRequest request) {
         userService.updateUserInformation(userId, request);
 
         return ResponseEntity.ok("Update thông tin thành công");
     }
 
     @PostMapping("/user-info/{userId}")
-    public ResponseEntity<User> getUserInformationDetails(@PathVariable Integer userId){
+    public ResponseEntity<User> getUserInformationDetails(@PathVariable Integer userId) {
         return ResponseEntity.ok(userService.getUserInformationDetail(userId));
     }
 }

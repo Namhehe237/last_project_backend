@@ -15,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuestionResponse {
+    private Integer questionId;
     private String questionText;
     private QuestionType questionType;
     private DifficultyLevel difficultyLevel;
