@@ -14,6 +14,7 @@ import com.example.demo.examOnline.domain.ExamQuestion;
 import com.example.demo.examOnline.domain.QuestionsBank;
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.request.ExamFilterRequest;
 import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ExamQuestionRepository;
@@ -89,7 +90,7 @@ public class ExamService {
 
         }
 
-        public Page<ExamResponse> getListExam(Pageable pageable) {
-                return examRepository.getListExam(pageable);
+        public Page<ExamResponse> getListExam(ExamFilterRequest request, Pageable pageable) {
+                return examRepository.getListExams(request.getClassId(), request.getStudentId(), pageable);
         }
 }

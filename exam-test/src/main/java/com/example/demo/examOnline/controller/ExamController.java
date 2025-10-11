@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.request.ExamFilterRequest;
 import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.service.ExamService;
 
@@ -50,10 +51,11 @@ public class ExamController {
 
     @PostMapping("/get-all-exam")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
-    public ResponseEntity<Page<ExamResponse>> getAllExamTest(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<ExamResponse>> getAllExamTest(@RequestBody ExamFilterRequest request,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(examService.getListExam(pageable));
+        return ResponseEntity.ok(examService.getListExam(request, pageable));
     }
 }
