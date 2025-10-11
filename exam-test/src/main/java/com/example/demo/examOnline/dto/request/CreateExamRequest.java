@@ -22,6 +22,6 @@ public class CreateExamRequest {
     private LocalDateTime endTime; // Optional - có thể null
     
     private ExamStatus examStatus;
-    private String teacherName;
+    private Integer teacherId;
     private List<Integer> questionId;
 }

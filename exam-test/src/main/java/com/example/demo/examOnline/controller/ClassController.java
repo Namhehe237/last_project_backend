@@ -48,7 +48,7 @@ public class ClassController {
     }
 
     @PostMapping("/class-detail/list-student/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<Page<UserResponseDTO>> getStudentOfClass(@PathVariable Integer classId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
