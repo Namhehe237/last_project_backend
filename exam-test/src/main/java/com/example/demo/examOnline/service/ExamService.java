@@ -37,9 +37,9 @@ public class ExamService {
                 Classes classEntity = classRepository.findByClassName(request.getClassName())
                                 .orElseThrow(() -> new RuntimeException("Class not found: " + request.getClassName()));
 
-                User teacher = userRepository.findByFullName(request.getTeacherName())
+                User teacher = userRepository.findById(request.getTeacherId())
                                 .orElseThrow(() -> new RuntimeException(
-                                                "Teacher not found: " + request.getTeacherName()));
+                                                "Teacher not found: " + request.getTeacherId()));
 
                 Exam exam = Exam.builder()
                                 .examName(request.getExamName())
