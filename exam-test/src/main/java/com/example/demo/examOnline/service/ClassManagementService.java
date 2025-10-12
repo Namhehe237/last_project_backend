@@ -43,8 +43,8 @@ public class ClassManagementService {
             User currentStudent = userRepository.findById(request.getStudentId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy học sinh với ID: " + request.getStudentId()));
             
-            // Tìm lớp học theo classId
-            Optional<Classes> classOptional = classRepository.findById(request.getClassId());
+            // Tìm lớp học theo classCode (FE gửi mã lớp)
+            Optional<Classes> classOptional = classRepository.findByClassCode(request.getClassCode());
             if (classOptional.isEmpty()) {
                 return MessageResponse.builder()
                         .message("Lớp học không tồn tại")
