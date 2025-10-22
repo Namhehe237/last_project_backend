@@ -54,7 +54,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/exam/snapshot/**",
                                 "/api/exam/paper/**",
-                                "/api/exam/grade"
+                                "/api/exam/grade",
+                                "/api/exam/get-all-exam",
+                                "/api/exam/get-exam-details/**"
                         ).hasAnyRole("ADMIN", "TEACHER", "STUDENT")
                         .requestMatchers("/api/exam/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers("/api/class/**").hasAnyRole("ADMIN", "TEACHER")
