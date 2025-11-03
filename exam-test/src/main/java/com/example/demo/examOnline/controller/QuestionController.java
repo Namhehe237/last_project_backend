@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.examOnline.dto.request.AddQuestionRequest;
 import com.example.demo.examOnline.dto.request.DeleteQuestionRequest;
@@ -69,6 +70,16 @@ public class QuestionController {
     public ResponseEntity<String> deleteQuestions(@RequestBody DeleteQuestionRequest request) {
         questionService.deleteQuestions(request.getQuestionId());
         return ResponseEntity.ok("Deleted successfully");
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            questionService.parseExcelFile(file);
+            return ResponseEntity.ok("Import questions successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 
 }
