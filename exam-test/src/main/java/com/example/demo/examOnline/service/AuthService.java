@@ -34,7 +34,7 @@ public class AuthService {
                         // Kiểm tra user có tồn tại không
                         User user = userRepository.findByEmail(request.getEmail())
                                         .orElseThrow(() -> new RuntimeException("User not found"));
-
+                       
                         System.out.println("User found: " + user.getEmail());
                         System.out.println("User active: " + user.getIsActive());
                         System.out.println("Password hash in DB: " + user.getPasswordHash());
