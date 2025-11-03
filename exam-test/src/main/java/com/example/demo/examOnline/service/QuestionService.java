@@ -1,5 +1,6 @@
 package com.example.demo.examOnline.service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,11 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.examOnline.domain.Answer;
 import com.example.demo.examOnline.domain.QuestionsBank;
@@ -156,6 +164,80 @@ public class QuestionService {
     @Transactional
     public void deleteQuestions(List<Integer> questionIds) {
         questionRepository.deleteByIds(questionIds);
+    }
+
+    public void parseExcelFile(MultipartFile file) throws IOException {
+        List<QuestionsBank> questions = new ArrayList<>();
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null)
+                    continue;
+
+                QuestionsBank question = QuestionsBank.builder()
+                        .questionText(getCellValue(row.getCell(0)))
+                        .difficultyLevel(parseDifficultyLevel(getCellValue(row.getCell(1))))
+                        .subjectName(getCellValue(row.getCell(2)))
+                        .questionType(QuestionType.MULTIPLE_CHOICE)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+
+                List<Answer> answers = new ArrayList<>();
+                for (int j = 3; j <= 6; j++) {
+                    String answerText = getCellValue(row.getCell(j));
+                    if (answerText == null || answerText.isEmpty())
+                        continue;
+
+                    boolean isCorrect = (j == 3);
+                    Answer answer = Answer.builder()
+                            .answerText(answerText)
+                            .isCorrect(isCorrect)
+                            .question(question)
+                            .build();
+
+                    answers.add(answer);
+                }
+
+                question.setAnswers(answers);
+                questions.add(question);
+            }
+        }
+        questionRepository.saveAll(questions);
+    }
+
+    private String getCellValue(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return "";
+        }
+    }
+
+    private DifficultyLevel parseDifficultyLevel(String value) {
+        if (value == null || value.isBlank()) {
+            return DifficultyLevel.MEDIUM; // default
+        }
+
+        try {
+            return DifficultyLevel.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Nếu Excel có giá trị sai như "easyyy" -> fallback
+            return DifficultyLevel.MEDIUM;
+        }
     }
 
 }
