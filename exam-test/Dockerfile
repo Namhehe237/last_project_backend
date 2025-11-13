@@ -1,5 +1,5 @@
 # Sử dụng OpenJDK 21 làm base image
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk AS build
 
 # Thiết lập thông tin metadata
 LABEL maintainer="Online Exam Platform"
