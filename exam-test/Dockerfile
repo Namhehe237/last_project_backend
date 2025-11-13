@@ -1,15 +1,7 @@
-# Sử dụng OpenJDK 21 làm base image
-FROM eclipse-temurin:21-jdk
+# ========== Stage 1: Build ==========
+FROM eclipse-temurin:21-jdk AS build
 
-# Thiết lập thông tin metadata
-LABEL maintainer="Online Exam Platform"
-LABEL version="1.0"
-LABEL description="Spring Boot application for Online Exam Platform"
-
-# Cài đặt curl cho health check
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# Tạo thư mục làm việc
+# Thư mục làm việc
 WORKDIR /app
 
 # Copy Maven wrapper và pom.xml
@@ -20,24 +12,32 @@ COPY pom.xml .
 # Cấp quyền thực thi cho Maven wrapper
 RUN chmod +x mvnw
 
-# Download dependencies (cache layer)
+# Tải dependencies (cache layer)
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY src src
 
-# Build ứng dụng
+# Build JAR
 RUN ./mvnw clean package -DskipTests
 
-# Tạo thư mục cho logs
+# ========== Stage 2: Runtime ==========
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copy file jar từ stage build
+COPY --from=build /app/target/*.jar app.jar
+
+# Tạo thư mục logs
 RUN mkdir -p /app/logs
 
-# Expose port
+# Mở port ứng dụng
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Command để chạy ứng dụng
-CMD ["java", "-jar", "target/exam-test-0.0.1-SNAPSHOT.jar"] 
+# Lệnh chạy ứng dụng
+ENTRYPOINT ["java", "-jar", "app.jar"]
