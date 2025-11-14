@@ -4,9 +4,9 @@ jwt:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/online_exam_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${PGUSER:root}
-    password: ${PGPASSWORD:1234}
+    url: ${RAILWAY_MYSQL_URL:jdbc:mysql://localhost:3306/online_exam_platform?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${RAILWAY_MYSQL_USER:root}
+    password: ${RAILWAY_MYSQL_PASSWORD:1234}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     serialization:
