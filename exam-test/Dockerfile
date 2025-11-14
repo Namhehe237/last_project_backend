@@ -1,37 +1,34 @@
-# ===== Stage 1: Build =====
+# ===== BUILD STAGE =====
 FROM eclipse-temurin:21-jdk AS build
 
 WORKDIR /app
 
-# Copy Maven wrapper và pom.xml
+# Copy Maven wrapper & pom
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Fix CRLF trên Windows
+RUN sed -i 's/\r$//' mvnw
 RUN chmod +x mvnw
 
-# Download dependencies
+# Download dependencies trước
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
-COPY src ./src
+COPY src src
 
-# Build ứng dụng
+# Build application
 RUN ./mvnw clean package -DskipTests
 
-# ===== Stage 2: Run =====
-FROM eclipse-temurin:21-jre
+# ===== RUN STAGE =====
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-# Copy file jar từ stage build sang stage run
+# Copy jar từ stage build
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-# Health check (optional)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-# Run ứng dụng
 CMD ["java", "-jar", "app.jar"]
