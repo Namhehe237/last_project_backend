@@ -17,10 +17,14 @@ import lombok.Setter;
 public class StudentAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "answer_id")
     private Integer studentAnswerId;
 
     @ManyToOne
-    @JoinColumn(name = "student_exam_id")
+    @JoinColumns({
+        @JoinColumn(name = "student_id", referencedColumnName = "student_id"),
+        @JoinColumn(name = "exam_id", referencedColumnName = "exam_id")
+    })
     private StudentExam studentExam;
 
     @ManyToOne
@@ -31,7 +35,12 @@ public class StudentAnswer {
     @JoinColumn(name = "chosen_answer_id")
     private Answer chosenAnswer;
 
-    private String essayAnswerText;
+    @Column(name = "answer_text")
+    private String essayAnswerText; // For essay questions, stored in answer_text column
+
+    @Column(name = "is_correct")
     private Boolean isCorrect;
+
+    @Column(name = "points_earned")
     private Double scoreEarned;
 }

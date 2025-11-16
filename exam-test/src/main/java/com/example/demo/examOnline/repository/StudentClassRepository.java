@@ -16,11 +16,11 @@ import java.util.Optional;
 public interface StudentClassRepository extends JpaRepository<StudentClass, StudentClassId> {
     
     // Tìm tất cả lớp học mà học sinh đã tham gia
-    @Query("SELECT sc FROM StudentClass sc WHERE sc.student.id = :studentId")
+    @Query("SELECT sc FROM StudentClass sc WHERE sc.student.userId = :studentId")
     List<StudentClass> findByStudentId(@Param("studentId") Integer studentId);
     
     // Kiểm tra học sinh đã tham gia lớp học chưa
-    @Query("SELECT sc FROM StudentClass sc WHERE sc.student.id = :studentId AND sc.classEntity.classId = :classId")
+    @Query("SELECT sc FROM StudentClass sc WHERE sc.student.userId = :studentId AND sc.classEntity.classId = :classId")
     Optional<StudentClass> findByStudentIdAndClassId(@Param("studentId") Integer studentId, @Param("classId") Integer classId);
     
     // Đếm số học sinh trong một lớp
@@ -32,4 +32,8 @@ public interface StudentClassRepository extends JpaRepository<StudentClass, Stud
     @Transactional
     @Query("DELETE FROM StudentClass sc WHERE sc.student.userId = :studentId AND sc.classEntity.classId = :classId")
     void deleteByStudentIdAndClassEntityClassId(@Param("studentId") Integer studentId, @Param("classId") Integer classId);
+    
+    // Lấy danh sách học sinh trong lớp
+    @Query("SELECT sc FROM StudentClass sc WHERE sc.classEntity.classId = :classId")
+    List<StudentClass> findByClassId(@Param("classId") Integer classId);
 }

@@ -39,7 +39,7 @@ public class ClassController {
     }
 
     @PostMapping("/class-detail/request/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER','STUDENT')")
     public ResponseEntity<Page<RequestJoinClassResponse>> getRequestOfClass(@PathVariable Integer classId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -57,7 +57,7 @@ public class ClassController {
     }
 
     @PostMapping("/class-detail/{classId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
     public ResponseEntity<ClassResponseDTO> getClassInformationDetail(@PathVariable Integer classId) {
         return ResponseEntity.ok(classService.getClassInformationDetail(classId));
     }

@@ -20,23 +20,31 @@ import com.example.demo.examOnline.domain.enums.StudentExamStatus;
 @AllArgsConstructor
 @Builder
 public class StudentExam {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer studentExamId;
+    @EmbeddedId
+    private StudentExamId id;
 
+    @Column(name = "start_time")
     private LocalDateTime startTime;
+    
+    @Column(name = "end_time")
     private LocalDateTime submitTime;
+    
     private Double score;
     private Integer attemptNumber;
+    
+    @Column(name = "video_url")
+    private String videoUrl; // URL of recorded video on Cloudinary
 
     @Enumerated(EnumType.STRING)
     private StudentExamStatus status;
 
     @ManyToOne
+    @MapsId("studentId")
     @JoinColumn(name = "student_id")
     private User student;
 
     @ManyToOne
+    @MapsId("examId")
     @JoinColumn(name = "exam_id")
     private Exam exam;
 

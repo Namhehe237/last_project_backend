@@ -60,5 +60,18 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("Không có user này"));
     }
+
+    public Integer getUserIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getUserId)
+                .orElse(null);
+    }
+
+    public void updateAvatarUrl(Integer userId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        user.setAvatarUrl(avatarUrl);
+        userRepository.save(user);
+    }
     
 }
