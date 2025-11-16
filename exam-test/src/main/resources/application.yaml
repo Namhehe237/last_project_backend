@@ -9,9 +9,9 @@ cloudinary:
 
 spring:
   datasource:
-    url: ${RAILWAY_MYSQL_URL}
-    username: ${RAILWAY_MYSQL_USER}
-    password: ${RAILWAY_MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/online_exam_platform?useSSL=true&requireSSL=true
+    username: root
+    password: Thanhnam2307
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     serialization:
@@ -38,12 +38,15 @@ spring:
         order_inserts: true
         order_updates: true
   # Redis Configuration
+  # eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3NjMzMDM3MzcsImV4cCI6MTc2MzM5MDEzN30.kCoK9bGjjdprxuaRi9SG-efcbNY1s8pRmS-VRvT8tiM
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:} # Redis password (optional)
-      timeout: 2000ms
+      host: centerbeam.proxy.rlwy.net
+      port: 31936
+      username: default
+      password: CZTCNIAWZPacFuPkMyXGUxaPHMZUOCJs
+      ssl:
+        enabled: true
       lettuce:
         pool:
           max-active: 8
@@ -65,3 +68,9 @@ spring:
 
 server:
   port: ${PORT:8080}
+
+logging:
+  level:
+    io.lettuce.core: DEBUG
+    org.springframework.data.redis: DEBUG
+    io.netty: DEBUG

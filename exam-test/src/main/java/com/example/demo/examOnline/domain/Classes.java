@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Classes {
+public class Classes  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer classId;
