@@ -9,13 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.examOnline.dto.cache.ExamSnapshot;
 import com.example.demo.examOnline.service.ClassService;
+import com.example.demo.examOnline.service.ExamCacheService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +31,7 @@ public class RedisController {
 
     @PostMapping("add")
     public ResponseEntity<String> add() {
-        classService.getClassInformationDetail(1);
+        classService.getClassInformationDetail(4);
         return ResponseEntity.ok("ok");
     }
 
@@ -67,6 +71,18 @@ public class RedisController {
                     "cause", e.getCause() != null ? e.getCause().getMessage() : "null",
                     "stackTrace", sw.toString()));
         }
+    }
+
+    private final ExamCacheService examCacheService;
+
+    @GetMapping("/cache/{examId}")
+    public ResponseEntity<?> getExamCache(@PathVariable Integer examId) {
+        ExamSnapshot snapshot = examCacheService.getExamFromCache(examId);
+        if (snapshot == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Exam cache not found for id: " + examId);
+        }
+        return ResponseEntity.ok(snapshot);
     }
 
 }

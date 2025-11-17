@@ -42,7 +42,7 @@ public class ClassService {
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
 
-    @Cacheable("test")
+    @Cacheable(value = "class", key = "'class_detail_' + #classId")
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
         System.out.println(">>> RUN DB QUERY, NOT FROM CACHE <<<");
         Classes classes = classRepository.findById(classId)
