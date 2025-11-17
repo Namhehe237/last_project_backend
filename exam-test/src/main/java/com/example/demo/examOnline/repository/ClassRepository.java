@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.examOnline.domain.Classes;
+import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 
@@ -66,4 +67,8 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         Optional<Classes> findByClassCode(String classCode);
 
         Optional<Classes> findByClassName(String className);
+
+        @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassOptionResponse(c.classId, c.className) "
+                        + "FROM Classes c WHERE c.teacher.userId = :teacherId ORDER BY c.className ASC")
+        List<ClassOptionResponse> findClassOptionsByTeacherId(@Param("teacherId") Integer teacherId);
 }

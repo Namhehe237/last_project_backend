@@ -1,10 +1,12 @@
 package com.example.demo.examOnline.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import com.example.demo.examOnline.dto.cache.AnswerSnapshot;
 import com.example.demo.examOnline.dto.cache.ExamSnapshot;
 import com.example.demo.examOnline.dto.cache.QuestionSnapshot;
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.request.CreateRandomExamRequest;
 import com.example.demo.examOnline.dto.request.ExamFilterRequest;
 import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.dto.response.AnswerPaperResponse;
@@ -27,6 +30,8 @@ import com.example.demo.examOnline.dto.request.ForceSubmitExamRequest;
 import com.example.demo.examOnline.dto.response.GradeExamResponse;
 import com.example.demo.examOnline.dto.response.TestHistoryResponse;
 import com.example.demo.examOnline.dto.response.ExamResultDetailResponse;
+import com.example.demo.examOnline.dto.response.RandomExamResponse;
+import com.example.demo.examOnline.dto.request.UpdateExamQuestionsRequest;
 import com.example.demo.examOnline.repository.ClassRepository;
 import com.example.demo.examOnline.repository.ExamQuestionRepository;
 import com.example.demo.examOnline.repository.ExamRepository;
@@ -38,6 +43,7 @@ import com.example.demo.examOnline.domain.StudentExam;
 import com.example.demo.examOnline.domain.StudentAnswer;
 import com.example.demo.examOnline.domain.Answer;
 import com.example.demo.examOnline.repository.AnswerRepository;
+import com.example.demo.examOnline.domain.enums.DifficultyLevel;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +61,63 @@ public class ExamService {
         private final AnswerRepository answerRepository;
 
         public void createExam(CreateExamRequest request) {
+                List<QuestionsBank> questions = questionRepository.findAllById(request.getQuestionId());
+                createExamInternal(request, questions);
+        }
+
+        public RandomExamResponse createRandomExam(CreateRandomExamRequest request) {
+                int easyCount = request.getEasyQuestionCount() != null ? request.getEasyQuestionCount() : 0;
+                int mediumCount = request.getMediumQuestionCount() != null ? request.getMediumQuestionCount() : 0;
+                int hardCount = request.getHardQuestionCount() != null ? request.getHardQuestionCount() : 0;
+
+                if (easyCount < 0 || mediumCount < 0 || hardCount < 0) {
+                        throw new IllegalArgumentException("Question counts cannot be negative");
+                }
+
+                int totalRequested = easyCount + mediumCount + hardCount;
+                Integer totalFromRequest = request.getTotalQuestions();
+                if (totalFromRequest != null && totalFromRequest.intValue() != totalRequested) {
+                        throw new IllegalArgumentException("Total questions does not match the sum of difficulty counts");
+                }
+                if (totalRequested <= 0) {
+                        throw new IllegalArgumentException("Total number of questions must be greater than zero");
+                }
+
+                List<QuestionsBank> selectedQuestions = new ArrayList<>();
+                selectedQuestions.addAll(selectRandomQuestions(DifficultyLevel.EASY, easyCount));
+                selectedQuestions.addAll(selectRandomQuestions(DifficultyLevel.MEDIUM, mediumCount));
+                selectedQuestions.addAll(selectRandomQuestions(DifficultyLevel.HARD, hardCount));
+
+                List<Integer> questionIds = selectedQuestions.stream()
+                                .map(QuestionsBank::getQuestionId)
+                                .toList();
+                request.setQuestionId(questionIds);
+
+                Exam exam = createExamInternal(request, selectedQuestions);
+
+                return RandomExamResponse.builder()
+                                .examId(exam.getExamId())
+                                .examName(exam.getExamName())
+                                .subjectName(exam.getSubjectName())
+                                .durationMinutes(exam.getDurationMinutes())
+                                .maxAttempts(exam.getMaxAttempts())
+                                .className(exam.getClassEntity() != null ? exam.getClassEntity().getClassName() : null)
+                                .startTime(exam.getStartTime())
+                                .endTime(exam.getEndTime())
+                                .examStatus(exam.getStatus())
+                                .questions(selectedQuestions.stream()
+                                                .map(q -> RandomExamResponse.QuestionSummary.builder()
+                                                                .questionId(q.getQuestionId())
+                                                                .questionText(q.getQuestionText())
+                                                                .questionType(q.getQuestionType())
+                                                                .difficultyLevel(q.getDifficultyLevel())
+                                                                .subjectName(q.getSubjectName())
+                                                                .build())
+                                                .toList())
+                                .build();
+        }
+
+        private Exam createExamInternal(CreateExamRequest request, List<QuestionsBank> questions) {
                 Classes classEntity = classRepository.findByClassName(request.getClassName())
                                 .orElseThrow(() -> new RuntimeException("Class not found: " + request.getClassName()));
 
@@ -79,29 +142,71 @@ public class ExamService {
                 try {
                         examRepository.save(exam);
                 } catch (DataIntegrityViolationException e) {
-                        e.printStackTrace(); // log chi tiết
+                        e.printStackTrace();
                         throw e;
                 }
 
-                // Thêm question vào exam
-                List<QuestionsBank> questions = questionRepository.findAllById(request.getQuestionId());
                 List<ExamQuestion> examQuestions = questions.stream()
                                 .map(q -> new ExamQuestion(exam, q))
                                 .toList();
 
                 examQuestionRepository.saveAll(examQuestions);
-
                 exam.setExamQuestions(examQuestions);
 
-                // Build snapshot and cache in Redis for fast retrieval during exam
+                cacheExamSnapshot(exam, classEntity, teacher, questions);
+                return exam;
+        }
+
+        public void updateExamQuestions(Integer examId, UpdateExamQuestionsRequest request) {
+                if (request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
+                        throw new IllegalArgumentException("Question list cannot be empty");
+                }
+
+                Exam exam = examRepository.findById(examId)
+                                .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+
+                List<QuestionsBank> questions = questionRepository.findAllById(request.getQuestionIds());
+                if (questions.size() != request.getQuestionIds().size()) {
+                        throw new RuntimeException("Some questions do not exist");
+                }
+
+                examQuestionRepository.deleteByExamExamId(examId);
+
+                List<ExamQuestion> examQuestions = questions.stream()
+                                .map(q -> new ExamQuestion(exam, q))
+                                .toList();
+
+                examQuestionRepository.saveAll(examQuestions);
+                exam.setExamQuestions(examQuestions);
+
+                examCacheService.evictExam(examId);
+                cacheExamSnapshot(exam, exam.getClassEntity(), exam.getTeacher(), questions);
+        }
+
+        private List<QuestionsBank> selectRandomQuestions(DifficultyLevel level, int count) {
+                if (count <= 0) {
+                        return List.of();
+                }
+
+                List<QuestionsBank> questions = questionRepository.findRandomQuestionsByDifficulty(level,
+                                PageRequest.of(0, count));
+
+                if (questions.size() < count) {
+                        throw new IllegalArgumentException(String.format("Not enough %s questions available", level.name()));
+                }
+
+                return questions;
+        }
+
+        private void cacheExamSnapshot(Exam exam, Classes classEntity, User teacher, List<QuestionsBank> questions) {
                 ExamSnapshot snapshot = ExamSnapshot.builder()
                                 .examId(exam.getExamId())
                                 .examName(exam.getExamName())
                                 .subjectName(exam.getSubjectName())
                                 .durationMinutes(exam.getDurationMinutes())
                                 .maxAttempts(exam.getMaxAttempts())
-                                .className(classEntity.getClassName())
-                                .teacherName(teacher.getFullName())
+                                .className(classEntity != null ? classEntity.getClassName() : null)
+                                .teacherName(teacher != null ? teacher.getFullName() : null)
                                 .startTime(exam.getStartTime())
                                 .endTime(exam.getEndTime())
                                 .questions(questions.stream().map(q -> QuestionSnapshot.builder()
@@ -122,7 +227,6 @@ public class ExamService {
                                 .build();
 
                 examCacheService.cacheExam(snapshot);
-
         }
 
         public void deleteExam(Integer examId) {

@@ -42,4 +42,13 @@ public interface QuestionRepository extends JpaRepository<QuestionsBank, Integer
         @Transactional
         @Query("DELETE FROM QuestionsBank q WHERE q.questionId IN :ids")
         void deleteByIds(@Param("ids") List<Integer> ids);
+
+        @Query("""
+                        SELECT q FROM QuestionsBank q
+                        WHERE q.difficultyLevel = :difficultyLevel
+                        ORDER BY function('RAND')
+                        """)
+        List<QuestionsBank> findRandomQuestionsByDifficulty(
+                        @Param("difficultyLevel") DifficultyLevel difficultyLevel,
+                        Pageable pageable);
 }

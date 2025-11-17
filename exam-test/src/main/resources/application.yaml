@@ -9,9 +9,9 @@ cloudinary:
 
 spring:
   datasource:
-    url: ${RAILWAY_MYSQL_URL}
-    username: ${RAILWAY_MYSQL_USER}
-    password: ${RAILWAY_MYSQL_PASSWORD}
+    url: ${RAILWAY_MYSQL_URL:jdbc:mysql://localhost:3306/online_exam_platform?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${RAILWAY_MYSQL_USER:root}
+    password: ${RAILWAY_MYSQL_PASSWORD:dnp220598}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     serialization:
@@ -40,9 +40,12 @@ spring:
   # Redis Configuration
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:} # Redis password (optional)
+      # host: ${REDIS_HOST:localhost}
+      # port: ${REDIS_PORT:6379}
+      # password: ${REDIS_PASSWORD:} 
+      host: centerbeam.proxy.rlwy.net
+      port: 31936
+      password: CZTCNIAWZPacFuPkMyXGUxaPHMZUOCJs
       timeout: 2000ms
       lettuce:
         pool:
