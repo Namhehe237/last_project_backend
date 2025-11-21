@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.management.RuntimeErrorException;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +43,9 @@ public class ClassService {
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
 
+    @Cacheable(value = "class", key = "'class_detail_' + #classId")
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
-
+        System.out.println(">>> RUN DB QUERY, NOT FROM CACHE <<<");
         Classes classes = classRepository.findById(classId)
                 .orElseThrow(() -> new RuntimeException("Không có thông tin về lớp học này"));
 

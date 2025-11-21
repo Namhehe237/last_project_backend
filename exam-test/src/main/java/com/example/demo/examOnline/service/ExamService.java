@@ -215,7 +215,8 @@ public class ExamService {
                                                 .questionType(q.getQuestionType())
                                                 .difficultyLevel(q.getDifficultyLevel())
                                                 .subjectName(q.getSubjectName())
-                                                .teacherName(q.getTeacher() != null ? q.getTeacher().getFullName() : null)
+                                                .teacherName(q.getTeacher() != null ? q.getTeacher().getFullName()
+                                                                : null)
                                                 .answers(q.getAnswers().stream().map(a -> AnswerSnapshot.builder()
                                                                 .answerId(a.getAnswerId())
                                                                 .answerText(a.getAnswerText())
@@ -226,7 +227,8 @@ public class ExamService {
                                                 .toList())
                                 .build();
 
-                examCacheService.cacheExam(snapshot);
+                examCacheService.cacheExam(exam.getExamId(), snapshot);
+
         }
 
         public void deleteExam(Integer examId) {
@@ -278,7 +280,8 @@ public class ExamService {
                                                 .questionType(q.getQuestionType())
                                                 .difficultyLevel(q.getDifficultyLevel())
                                                 .subjectName(q.getSubjectName())
-                                                .teacherName(q.getTeacher() != null ? q.getTeacher().getFullName() : null)
+                                                .teacherName(q.getTeacher() != null ? q.getTeacher().getFullName()
+                                                                : null)
                                                 .answers(q.getAnswers().stream().map(a -> AnswerSnapshot.builder()
                                                                 .answerId(a.getAnswerId())
                                                                 .answerText(a.getAnswerText())
@@ -287,7 +290,7 @@ public class ExamService {
                                                 .build()).toList())
                                 .build();
 
-                examCacheService.cacheExam(snapshot);
+                examCacheService.cacheExam(exam.getExamId(), snapshot);
                 return snapshot;
         }
 
@@ -346,36 +349,40 @@ public class ExamService {
                 // Save score and submitTime to StudentExam, and save student answers
                 saveExamResult(request.getExamId(), request.getStudentId(), score, total, correct, details);
 
-        return GradeExamResponse.builder()
-                .examId(s.getExamId())
-                .totalQuestions(total)
-                .correctAnswers(correct)
-                .score(score)
-                .details(details)
-                .build();
+                return GradeExamResponse.builder()
+                                .examId(s.getExamId())
+                                .totalQuestions(total)
+                                .correctAnswers(correct)
+                                .score(score)
+                                .details(details)
+                                .build();
         }
 
-        private void saveExamResult(Integer examId, Integer studentId, Double score, Integer totalQuestions, Integer correctAnswers, List<GradeExamResponse.ResultDetail> details) {
+        private void saveExamResult(Integer examId, Integer studentId, Double score, Integer totalQuestions,
+                        Integer correctAnswers, List<GradeExamResponse.ResultDetail> details) {
                 try {
                         if (examId == null || studentId == null) {
-                                System.err.println("Error: examId or studentId is null - examId: " + examId + ", studentId: " + studentId);
+                                System.err.println("Error: examId or studentId is null - examId: " + examId
+                                                + ", studentId: " + studentId);
                                 return;
                         }
-                        
+
                         StudentExam studentExam = studentExamRepository
                                         .findByStudentUserIdAndExamExamId(studentId, examId)
                                         .orElseGet(() -> {
                                                 Exam exam = examRepository.findById(examId)
-                                                                .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+                                                                .orElseThrow(() -> new RuntimeException(
+                                                                                "Exam not found: " + examId));
                                                 User student = userRepository.findById(studentId)
-                                                                .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
-                                                
-                                                com.example.demo.examOnline.domain.StudentExamId id = 
-                                                        com.example.demo.examOnline.domain.StudentExamId.builder()
+                                                                .orElseThrow(() -> new RuntimeException(
+                                                                                "Student not found: " + studentId));
+
+                                                com.example.demo.examOnline.domain.StudentExamId id = com.example.demo.examOnline.domain.StudentExamId
+                                                                .builder()
                                                                 .studentId(studentId)
                                                                 .examId(examId)
                                                                 .build();
-                                                
+
                                                 return StudentExam.builder()
                                                                 .id(id)
                                                                 .exam(exam)
@@ -388,36 +395,42 @@ public class ExamService {
                         studentExam.setScore(score);
                         studentExam.setSubmitTime(LocalDateTime.now());
                         studentExam.setStatus(com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED);
-                        
-                        System.out.println("Saving exam result - examId: " + examId + ", studentId: " + studentId + ", score: " + score + ", submitTime: " + LocalDateTime.now());
-                        
+
+                        System.out.println("Saving exam result - examId: " + examId + ", studentId: " + studentId
+                                        + ", score: " + score + ", submitTime: " + LocalDateTime.now());
+
                         StudentExam saved = studentExamRepository.save(studentExam);
-                        System.out.println("Successfully saved exam result - examId: " + saved.getId().getExamId() + ", studentId: " + saved.getId().getStudentId() + ", score: " + saved.getScore() + ", submitTime: " + saved.getSubmitTime());
-                        
+                        System.out.println("Successfully saved exam result - examId: " + saved.getId().getExamId()
+                                        + ", studentId: " + saved.getId().getStudentId() + ", score: "
+                                        + saved.getScore() + ", submitTime: " + saved.getSubmitTime());
+
                         // Save student answers
                         if (details != null) {
                                 for (GradeExamResponse.ResultDetail detail : details) {
                                         QuestionsBank question = questionRepository.findById(detail.getQuestionId())
                                                         .orElse(null);
-                                        if (question == null) continue;
-                                        
+                                        if (question == null)
+                                                continue;
+
                                         Answer chosenAnswer = null;
                                         if (detail.getChosenAnswerId() != null) {
-                                                chosenAnswer = answerRepository.findById(detail.getChosenAnswerId()).orElse(null);
+                                                chosenAnswer = answerRepository.findById(detail.getChosenAnswerId())
+                                                                .orElse(null);
                                         }
-                                        
+
                                         StudentAnswer studentAnswer = StudentAnswer.builder()
                                                         .studentExam(saved)
                                                         .question(question)
                                                         .chosenAnswer(chosenAnswer)
                                                         .isCorrect(detail.isCorrect())
                                                         .build();
-                                        
+
                                         studentAnswerRepository.save(studentAnswer);
                                 }
                         }
                 } catch (Exception e) {
-                        System.err.println("Error saving exam result - examId: " + examId + ", studentId: " + studentId + ", error: " + e.getMessage());
+                        System.err.println("Error saving exam result - examId: " + examId + ", studentId: " + studentId
+                                        + ", error: " + e.getMessage());
                         e.printStackTrace();
                         // Don't throw exception to avoid breaking the grading response
                 }
@@ -459,16 +472,18 @@ public class ExamService {
                                 .findByStudentUserIdAndExamExamId(studentId, examId)
                                 .orElseGet(() -> {
                                         Exam exam = examRepository.findById(examId)
-                                                        .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+                                                        .orElseThrow(() -> new RuntimeException(
+                                                                        "Exam not found: " + examId));
                                         User student = userRepository.findById(studentId)
-                                                        .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
-                                        
-                                        com.example.demo.examOnline.domain.StudentExamId id = 
-                                                com.example.demo.examOnline.domain.StudentExamId.builder()
+                                                        .orElseThrow(() -> new RuntimeException(
+                                                                        "Student not found: " + studentId));
+
+                                        com.example.demo.examOnline.domain.StudentExamId id = com.example.demo.examOnline.domain.StudentExamId
+                                                        .builder()
                                                         .studentId(studentId)
                                                         .examId(examId)
                                                         .build();
-                                        
+
                                         return StudentExam.builder()
                                                         .id(id)
                                                         .exam(exam)
@@ -479,7 +494,8 @@ public class ExamService {
                                 });
 
                 studentExam.setVideoUrl(videoUrl);
-                // Update submitTime when video is uploaded (usually happens after exam submission)
+                // Update submitTime when video is uploaded (usually happens after exam
+                // submission)
                 if (studentExam.getSubmitTime() == null) {
                         studentExam.setSubmitTime(LocalDateTime.now());
                 }
@@ -489,11 +505,10 @@ public class ExamService {
         public List<TestHistoryResponse> getTestHistory(Integer studentId) {
                 List<com.example.demo.examOnline.domain.enums.StudentExamStatus> statuses = java.util.Arrays.asList(
                                 com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED,
-                                com.example.demo.examOnline.domain.enums.StudentExamStatus.GRADED
-                );
-                
+                                com.example.demo.examOnline.domain.enums.StudentExamStatus.GRADED);
+
                 List<StudentExam> studentExams = studentExamRepository.findTestHistoryByStudentId(studentId, statuses);
-                
+
                 return studentExams.stream().map(se -> {
                         Exam exam = se.getExam();
                         int totalQuestions = exam.getExamQuestions() != null ? exam.getExamQuestions().size() : 0;
@@ -521,34 +536,39 @@ public class ExamService {
                 StudentExam studentExam = studentExamRepository
                                 .findByStudentUserIdAndExamExamId(studentId, examId)
                                 .orElseThrow(() -> new RuntimeException("Student exam not found"));
-                
-                List<StudentAnswer> studentAnswers = studentAnswerRepository.findByStudentIdAndExamId(studentId, examId);
+
+                List<StudentAnswer> studentAnswers = studentAnswerRepository.findByStudentIdAndExamId(studentId,
+                                examId);
                 var answerMap = studentAnswers.stream()
                                 .collect(java.util.stream.Collectors.toMap(
                                                 sa -> sa.getQuestion().getQuestionId(),
                                                 sa -> sa));
-                
-                List<ExamResultDetailResponse.QuestionResultDetail> questionDetails = examSnapshot.getQuestions().stream()
+
+                List<ExamResultDetailResponse.QuestionResultDetail> questionDetails = examSnapshot.getQuestions()
+                                .stream()
                                 .map(q -> {
                                         StudentAnswer studentAnswer = answerMap.get(q.getQuestionId());
-                                        Integer chosenAnswerId = studentAnswer != null && studentAnswer.getChosenAnswer() != null
-                                                        ? studentAnswer.getChosenAnswer().getAnswerId()
-                                                        : null;
+                                        Integer chosenAnswerId = studentAnswer != null
+                                                        && studentAnswer.getChosenAnswer() != null
+                                                                        ? studentAnswer.getChosenAnswer().getAnswerId()
+                                                                        : null;
                                         Integer correctAnswerId = q.getAnswers().stream()
                                                         .filter(a -> a.isCorrect())
                                                         .map(a -> a.getAnswerId())
                                                         .findFirst()
                                                         .orElse(null);
-                                        Boolean isCorrect = studentAnswer != null ? studentAnswer.getIsCorrect() : false;
-                                        
-                                        List<ExamResultDetailResponse.AnswerDetail> answerDetails = q.getAnswers().stream()
+                                        Boolean isCorrect = studentAnswer != null ? studentAnswer.getIsCorrect()
+                                                        : false;
+
+                                        List<ExamResultDetailResponse.AnswerDetail> answerDetails = q.getAnswers()
+                                                        .stream()
                                                         .map(a -> ExamResultDetailResponse.AnswerDetail.builder()
                                                                         .answerId(a.getAnswerId())
                                                                         .answerText(a.getAnswerText())
                                                                         .isCorrect(a.isCorrect())
                                                                         .build())
                                                         .toList();
-                                        
+
                                         return ExamResultDetailResponse.QuestionResultDetail.builder()
                                                         .questionId(q.getQuestionId())
                                                         .questionText(q.getQuestionText())
@@ -559,10 +579,10 @@ public class ExamService {
                                                         .build();
                                 })
                                 .toList();
-                
+
                 int totalQuestions = examSnapshot.getQuestions().size();
                 int correctAnswers = (int) questionDetails.stream().filter(q -> q.getIsCorrect()).count();
-                
+
                 return ExamResultDetailResponse.builder()
                                 .examId(examId)
                                 .examName(examSnapshot.getExamName())
