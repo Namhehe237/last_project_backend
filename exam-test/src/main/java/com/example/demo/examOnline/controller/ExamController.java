@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
 import com.example.demo.examOnline.dto.request.CreateExamRequest;
+import com.example.demo.examOnline.dto.request.CreateRandomExamRequest;
 import com.example.demo.examOnline.dto.request.ExamFilterRequest;
 import com.example.demo.examOnline.dto.response.ExamResponse;
 import com.example.demo.examOnline.dto.cache.ExamSnapshot;
@@ -30,6 +32,8 @@ import com.example.demo.examOnline.dto.request.SubmitExamRequest;
 import com.example.demo.examOnline.dto.request.ForceSubmitExamRequest;
 import com.example.demo.examOnline.dto.response.GradeExamResponse;
 import com.example.demo.examOnline.dto.response.ExamResultDetailResponse;
+import com.example.demo.examOnline.dto.response.RandomExamResponse;
+import com.example.demo.examOnline.dto.request.UpdateExamQuestionsRequest;
 import com.example.demo.examOnline.service.ExamService;
 import com.example.demo.examOnline.service.CloudinaryService;
 import com.example.demo.examOnline.service.UserService;
@@ -52,6 +56,20 @@ public class ExamController {
         examService.createExam(request);
 
         return ResponseEntity.ok("Thêm bài kiểm tra thành công");
+    }
+
+    @PostMapping("/create-random")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<RandomExamResponse> createRandomExam(@RequestBody CreateRandomExamRequest request) {
+        return ResponseEntity.ok(examService.createRandomExam(request));
+    }
+
+    @PutMapping("/questions/{examId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> updateExamQuestions(@PathVariable Integer examId,
+            @RequestBody UpdateExamQuestionsRequest request) {
+        examService.updateExamQuestions(examId, request);
+        return ResponseEntity.ok("Cập nhật câu hỏi bài thi thành công");
     }
 
     @DeleteMapping("/delete-exam/{examId}")

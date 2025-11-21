@@ -5,6 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,7 @@ import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
+import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
@@ -99,6 +102,12 @@ public class ClassController {
         Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
 
         return ResponseEntity.ok(listClasses);
+    }
+
+    @PostMapping("/class-options/{teacherId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<List<ClassOptionResponse>> getClassOptions(@PathVariable Integer teacherId) {
+        return ResponseEntity.ok(classService.getClassOptions(teacherId));
     }
 
     @PostMapping("/remove-student/{classId}")

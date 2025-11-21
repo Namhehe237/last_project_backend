@@ -1,11 +1,10 @@
 package com.example.demo.examOnline.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,7 +12,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +27,6 @@ import com.example.demo.examOnline.domain.enums.QuestionType;
 import com.example.demo.examOnline.dto.request.AddQuestionRequest;
 import com.example.demo.examOnline.dto.response.AnswerResponse;
 import com.example.demo.examOnline.dto.response.QuestionResponse;
-import com.example.demo.examOnline.repository.AnswerRepository;
 import com.example.demo.examOnline.repository.QuestionRepository;
 import com.example.demo.examOnline.repository.UserRepository;
 
@@ -41,8 +38,6 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
-    private final AnswerRepository answerRepository;
-
     public void addQuestion(AddQuestionRequest request) {
 
         Boolean checkQuestion = questionRepository.existsByQuestionText(request.getQuestionText());
@@ -206,6 +201,41 @@ public class QuestionService {
             }
         }
         questionRepository.saveAll(questions);
+    }
+
+    public byte[] generateQuestionTemplate() throws IOException {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Questions");
+            String[] headers = {
+                    "Question Text",
+                    "Difficulty (EASY/MEDIUM/HARD)",
+                    "Subject Name",
+                    "Answer 1 (Correct)",
+                    "Answer 2",
+                    "Answer 3",
+                    "Answer 4"
+            };
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+
+            Row exampleRow = sheet.createRow(1);
+            exampleRow.createCell(0).setCellValue("Ví dụ: Java là gì?");
+            exampleRow.createCell(1).setCellValue("EASY");
+            exampleRow.createCell(2).setCellValue("Java Programming");
+            exampleRow.createCell(3).setCellValue("Ngôn ngữ lập trình hướng đối tượng");
+            exampleRow.createCell(4).setCellValue("Một framework");
+            exampleRow.createCell(5).setCellValue("Một CSDL");
+            exampleRow.createCell(6).setCellValue("Một hệ điều hành");
+
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
     }
 
     private String getCellValue(Cell cell) {
