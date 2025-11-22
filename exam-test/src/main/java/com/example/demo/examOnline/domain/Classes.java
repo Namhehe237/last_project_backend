@@ -19,7 +19,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Classes implements Serializable {
+public class Classes  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer classId;

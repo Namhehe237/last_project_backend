@@ -2,6 +2,8 @@ package com.example.demo.examOnline.service;
 
 import java.time.Duration;
 
+import org.springframework.cache.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,19 @@ public class ExamCacheService {
     private static final String KEY_PREFIX = "exam:snapshot:";
     private static final Duration DEFAULT_TTL = Duration.ofHours(6);
 
-    public void cacheExam(ExamSnapshot snapshot) {
-        if (snapshot == null || snapshot.getExamId() == null) return;
-        String key = KEY_PREFIX + snapshot.getExamId();
-        redisTemplate.opsForValue().set(key, snapshot, DEFAULT_TTL);
+    @Cacheable(value = "exam", key = "'exam_detail_' + #examId")
+    public ExamSnapshot cacheExam(Integer examId, ExamSnapshot snapshot) {
+        return snapshot;
+    }
+
+    private final CacheManager cacheManager;
+
+    public ExamSnapshot getExamFromCache(Integer examId) {
+        Cache cache = cacheManager.getCache("exam"); 
+        if (cache != null) {
+            return cache.get("exam_detail_" + examId, ExamSnapshot.class);
+        }
+        return null;
     }
 
     public ExamSnapshot getExam(Integer examId) {
@@ -33,5 +44,3 @@ public class ExamCacheService {
         redisTemplate.delete(KEY_PREFIX + examId);
     }
 }
-
-
