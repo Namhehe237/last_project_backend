@@ -23,6 +23,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public CommentResponseDTO createComment(CreateCommentRequest request) {
@@ -48,6 +49,32 @@ public class CommentService {
                 .build();
 
         Comment saved = commentRepository.save(comment);
+        
+        // If this is a reply, notify the parent comment author
+        if (parentComment != null) {
+            try {
+                Integer parentAuthorId = parentComment.getUser().getUserId();
+                // Don't notify if replying to own comment
+                if (!parentAuthorId.equals(user.getUserId())) {
+                    String title = "Có người trả lời bình luận của bạn";
+                    String message = String.format("%s đã trả lời bình luận của bạn: %s", 
+                            user.getFullName(), 
+                            saved.getContent().length() > 50 ? saved.getContent().substring(0, 50) + "..." : saved.getContent());
+                    Integer classId = post.getClassEntity() != null ? post.getClassEntity().getClassId() : null;
+                    notificationService.notifyUser(
+                            parentAuthorId, 
+                            title, 
+                            message, 
+                            com.example.demo.examOnline.domain.enums.NotificationType.COMMENT_REPLY,
+                            user.getUserId(),
+                            classId);
+                }
+            } catch (Exception e) {
+                // Log error but don't fail comment creation
+                System.err.println("Error sending comment reply notification: " + e.getMessage());
+            }
+        }
+        
         return mapToDTO(saved);
     }
 

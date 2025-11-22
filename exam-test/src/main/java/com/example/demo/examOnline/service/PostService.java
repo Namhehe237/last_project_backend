@@ -30,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final AssignmentSubmissionRepository assignmentSubmissionRepository;
     private final CloudinaryService cloudinaryService;
+    private final NotificationService notificationService;
 
     @Transactional
     public PostResponseDTO createPost(CreatePostRequest request, MultipartFile attachmentFile) {
@@ -80,6 +81,40 @@ public class PostService {
                 .build();
 
         Post saved = postRepository.save(post);
+        
+        // Notify all students in the class about the new post
+        try {
+            if (postType == PostType.ASSIGNMENT) {
+                String title = "Bài tập mới";
+                String message = String.format("Giáo viên %s đã giao bài tập '%s' cho lớp %s. Hạn nộp: %s", 
+                        teacher.getFullName(), 
+                        saved.getTitle(), 
+                        classEntity.getClassName(),
+                        saved.getDueDate() != null ? saved.getDueDate().toString() : "Chưa xác định");
+                notificationService.notifyStudentsInClass(
+                        classEntity.getClassId(), 
+                        title, 
+                        message, 
+                        com.example.demo.examOnline.domain.enums.NotificationType.ASSIGNMENT,
+                        teacher.getUserId());
+            } else if (postType == PostType.ANNOUNCEMENT) {
+                String title = "Thông báo mới";
+                String message = String.format("Giáo viên %s đã đăng thông báo '%s' trong lớp %s", 
+                        teacher.getFullName(), 
+                        saved.getTitle(), 
+                        classEntity.getClassName());
+                notificationService.notifyStudentsInClass(
+                        classEntity.getClassId(), 
+                        title, 
+                        message, 
+                        com.example.demo.examOnline.domain.enums.NotificationType.POST,
+                        teacher.getUserId());
+            }
+        } catch (Exception e) {
+            // Log error but don't fail post creation
+            log.error("Error sending post notifications: {}", e.getMessage(), e);
+        }
+        
         return mapToDTO(saved, null);
     }
 

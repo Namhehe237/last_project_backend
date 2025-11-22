@@ -25,6 +25,7 @@ public class AuthService {
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
         private final AuthenticationManager authenticationManager;
+        private final NotificationService notificationService;
 
         public AuthResponse authenticate(AuthRequest request) {
                 try {
@@ -59,6 +60,14 @@ public class AuthService {
                         // Generate JWT token
                         String jwtToken = jwtService.generateToken(user);
                         System.out.println("JWT token generated successfully");
+
+                        // Check assignment deadlines and notify if needed (async to not block login)
+                        try {
+                            notificationService.checkAndNotifyAssignmentDeadlines(user.getUserId());
+                        } catch (Exception e) {
+                            System.err.println("Error checking assignment deadlines on login: " + e.getMessage());
+                            // Don't fail login if deadline check fails
+                        }
 
                         return AuthResponse.builder()
                                         .accessToken(jwtToken)

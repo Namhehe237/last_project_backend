@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.example.demo.examOnline.service.UserService;
+import com.example.demo.examOnline.service.ClassService;
 @RestController
 @RequestMapping("/api/redis")
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ import com.example.demo.examOnline.service.UserService;
 public class RedisTestController {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserService userService;
+    private final ClassService classService;
     /**
      * Kiểm tra kết nối Redis
      * GET /api/redis/health
@@ -180,7 +180,7 @@ public class RedisTestController {
     @Cacheable(value = "sampleData")      
     @PostMapping("/add-sample-data")
     public ResponseEntity<String> addSampleData() {
-      userService.getUserInformationDetail(1);
+      classService.getClassInformationDetail(1);
       return ResponseEntity.ok("userService");
     }
     /**

@@ -4,5 +4,11 @@ public enum NotificationType {
     SYSTEM,
     CLASS,
     EXAM,
-    PERSONAL
+    PERSONAL,
+    ASSIGNMENT,
+    ASSIGNMENT_DEADLINE,
+    POST,
+    COMMENT_REPLY,
+    CLASS_JOIN_REQUEST,
+    CLASS_JOIN_APPROVED
 }

@@ -19,5 +19,8 @@ public interface StudentExamRepository extends JpaRepository<StudentExam, Studen
     
     @Query("SELECT se FROM StudentExam se WHERE se.student.userId = :studentId AND se.status IN :statuses ORDER BY se.submitTime DESC")
     List<StudentExam> findTestHistoryByStudentId(@Param("studentId") Integer studentId, @Param("statuses") List<StudentExamStatus> statuses);
+    
+    @Query("SELECT se FROM StudentExam se WHERE se.exam.examId = :examId")
+    List<StudentExam> findByExamExamId(@Param("examId") Integer examId);
 }
 

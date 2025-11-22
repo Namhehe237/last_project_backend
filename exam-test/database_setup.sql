@@ -125,10 +125,14 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id INT,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    notification_type ENUM('EXAM', 'CLASS', 'SYSTEM', 'GRADE') NOT NULL,
+    notification_type ENUM('SYSTEM', 'CLASS', 'EXAM', 'PERSONAL', 'ASSIGNMENT', 'ASSIGNMENT_DEADLINE', 'POST', 'COMMENT_REPLY', 'CLASS_JOIN_REQUEST', 'CLASS_JOIN_APPROVED') NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    class_id INT,
+    sender_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (class_id) REFERENCES classes(class_id),
+    FOREIGN KEY (sender_id) REFERENCES users(user_id)
 );
 
 -- Tạo bảng system_settings

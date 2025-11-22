@@ -28,14 +28,27 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
         e.examId, e.examName, e.subjectName, e.durationMinutes,
         e.classEntity.className, e.teacher.fullName
       )
-      FROM StudentExam se
-      JOIN se.exam e
+      FROM Exam e
       WHERE (:classId IS NULL OR e.classEntity.classId = :classId)
-        AND (:studentId IS NULL OR se.student.userId = :studentId)
+        AND (:studentId IS NULL OR e.classEntity.classId IN (
+          SELECT sc.classEntity.classId 
+          FROM StudentClass sc 
+          WHERE sc.student.userId = :studentId
+        ))
+        AND (:studentId IS NULL OR NOT EXISTS (
+          SELECT 1 FROM StudentExam se 
+          WHERE se.exam.examId = e.examId 
+            AND se.student.userId = :studentId
+            AND se.status IN (com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED, 
+                              com.example.demo.examOnline.domain.enums.StudentExamStatus.GRADED)
+        ))
       """)
   Page<ExamResponse> getListExams(
       @Param("classId") Integer classId,
       @Param("studentId") Integer studentId,
       Pageable pageable);
+
+  @Query("SELECT e FROM Exam e WHERE e.teacher.userId = :teacherId")
+  List<Exam> findByTeacherUserId(@Param("teacherId") Integer teacherId);
 
 }

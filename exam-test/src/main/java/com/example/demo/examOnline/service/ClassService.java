@@ -41,6 +41,7 @@ public class ClassService {
     private final ClassRequestRepository classRequestRepository;
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public ClassResponseDTO getClassInformationDetail(Integer classId) {
 
@@ -132,6 +133,29 @@ public class ClassService {
 
                 studentClassRepository.saveAll(studentClasses);
                 classRequestRepository.deleteAllInBatch(requests);
+                
+                // Notify students whose requests were approved
+                for (ClassRequest req : requests) {
+                    try {
+                        Integer studentId = req.getStudent().getUserId();
+                        Integer classId = req.getClassEntity().getClassId();
+                        String className = req.getClassEntity().getClassName();
+                        Integer teacherId = req.getClassEntity().getTeacher().getUserId();
+                        
+                        String title = "Yêu cầu tham gia lớp được chấp nhận";
+                        String message = String.format("Yêu cầu tham gia lớp '%s' của bạn đã được giáo viên chấp nhận.", className);
+                        
+                        notificationService.notifyUser(
+                                studentId, 
+                                title, 
+                                message, 
+                                com.example.demo.examOnline.domain.enums.NotificationType.CLASS_JOIN_APPROVED,
+                                teacherId,
+                                classId);
+                    } catch (Exception e) {
+                        System.err.println("Error sending approval notification: " + e.getMessage());
+                    }
+                }
             }
 
         } catch (Exception e) {

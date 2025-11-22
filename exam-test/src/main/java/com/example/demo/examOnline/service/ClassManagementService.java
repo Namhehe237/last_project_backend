@@ -31,6 +31,7 @@ public class ClassManagementService {
     private final ClassRequestRepository classRequestRepository;
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
 
     /**
@@ -84,6 +85,26 @@ public class ClassManagementService {
                     .build();
             
             classRequestRepository.save(classRequest);
+            
+            // Notify teacher about the join request
+            try {
+                Integer teacherId = classEntity.getTeacher().getUserId();
+                Integer classId = classEntity.getClassId();
+                String title = "Có học sinh xin vào lớp";
+                String message = String.format("Học sinh %s đã gửi yêu cầu tham gia lớp '%s'. Vui lòng xem xét và phê duyệt.", 
+                        currentStudent.getFullName(), 
+                        classEntity.getClassName());
+                
+                notificationService.notifyUser(
+                        teacherId, 
+                        title, 
+                        message, 
+                        com.example.demo.examOnline.domain.enums.NotificationType.CLASS_JOIN_REQUEST,
+                        currentStudent.getUserId(),
+                        classId);
+            } catch (Exception e) {
+                System.err.println("Error sending join request notification: " + e.getMessage());
+            }
             
             return MessageResponse.builder()
                     .message("Đã gửi yêu cầu tham gia lớp học: " + classEntity.getClassName() + ". Vui lòng đợi giáo viên phê duyệt.")

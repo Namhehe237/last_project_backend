@@ -52,9 +52,17 @@ public class ExamController {
     @PostMapping("/create-exam")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<String> createExam(@RequestBody CreateExamRequest request) {
-
+        log.info("=== CONTROLLER: Received create-exam request ===");
+        log.info("Request: examName={}, className={}, teacherId={}", 
+                request.getExamName(), request.getClassName(), request.getTeacherId());
+        System.out.println("=== SYSTEM.OUT: create-exam endpoint called ===");
+        System.out.println("Exam Name: " + request.getExamName());
+        System.out.println("Class Name: " + request.getClassName());
+        
         examService.createExam(request);
-
+        
+        log.info("=== CONTROLLER: Exam created successfully ===");
+        System.out.println("=== SYSTEM.OUT: Exam created successfully ===");
         return ResponseEntity.ok("Thêm bài kiểm tra thành công");
     }
 

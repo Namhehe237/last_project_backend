@@ -40,12 +40,9 @@ spring:
   # Redis Configuration
   data:
     redis:
-      # host: ${REDIS_HOST:localhost}
-      # port: ${REDIS_PORT:6379}
-      # password: ${REDIS_PASSWORD:} 
-      host: centerbeam.proxy.rlwy.net
-      port: 31936
-      password: CZTCNIAWZPacFuPkMyXGUxaPHMZUOCJs
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
       timeout: 2000ms
       lettuce:
         pool:
@@ -68,3 +65,12 @@ spring:
 
 server:
   port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    com.example.demo.examOnline: DEBUG
+    com.example.demo.examOnline.service.ExamService: INFO
+    com.example.demo.examOnline.service.NotificationService: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

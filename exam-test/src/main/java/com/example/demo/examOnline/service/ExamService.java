@@ -46,9 +46,11 @@ import com.example.demo.examOnline.repository.AnswerRepository;
 import com.example.demo.examOnline.domain.enums.DifficultyLevel;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExamService {
         private final ExamRepository examRepository;
         private final ClassRepository classRepository;
@@ -59,10 +61,18 @@ public class ExamService {
         private final StudentExamRepository studentExamRepository;
         private final StudentAnswerRepository studentAnswerRepository;
         private final AnswerRepository answerRepository;
+        private final NotificationService notificationService;
 
         public void createExam(CreateExamRequest request) {
+                System.out.println("=== SYSTEM.OUT: ExamService.createExam called ===");
+                log.info(">>> createExam called: examName={}, className={}, teacherId={}", 
+                        request.getExamName(), request.getClassName(), request.getTeacherId());
                 List<QuestionsBank> questions = questionRepository.findAllById(request.getQuestionId());
-                createExamInternal(request, questions);
+                log.info("Found {} questions for exam", questions.size());
+                System.out.println("Found " + questions.size() + " questions");
+                Exam exam = createExamInternal(request, questions);
+                log.info("<<< createExam completed: examId={}", exam.getExamId());
+                System.out.println("=== SYSTEM.OUT: ExamService.createExam completed, examId=" + exam.getExamId() + " ===");
         }
 
         public RandomExamResponse createRandomExam(CreateRandomExamRequest request) {
@@ -118,12 +128,20 @@ public class ExamService {
         }
 
         private Exam createExamInternal(CreateExamRequest request, List<QuestionsBank> questions) {
+                log.info(">>> createExamInternal started");
                 Classes classEntity = classRepository.findByClassName(request.getClassName())
-                                .orElseThrow(() -> new RuntimeException("Class not found: " + request.getClassName()));
+                                .orElseThrow(() -> {
+                                        log.error("Class not found: {}", request.getClassName());
+                                        return new RuntimeException("Class not found: " + request.getClassName());
+                                });
+                log.info("Found class: classId={}, className={}", classEntity.getClassId(), classEntity.getClassName());
 
                 User teacher = userRepository.findById(request.getTeacherId())
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Teacher not found: " + request.getTeacherId()));
+                                .orElseThrow(() -> {
+                                        log.error("Teacher not found: {}", request.getTeacherId());
+                                        return new RuntimeException("Teacher not found: " + request.getTeacherId());
+                                });
+                log.info("Found teacher: teacherId={}, teacherName={}", teacher.getUserId(), teacher.getFullName());
 
                 Exam exam = Exam.builder()
                                 .examName(request.getExamName())
@@ -139,21 +157,65 @@ public class ExamService {
                                 .updatedAt(LocalDateTime.now())
                                 .build();
 
+                log.info("Saving exam to database...");
                 try {
                         examRepository.save(exam);
+                        log.info("Exam saved successfully: examId={}", exam.getExamId());
                 } catch (DataIntegrityViolationException e) {
+                        log.error("Error saving exam: {}", e.getMessage(), e);
                         e.printStackTrace();
                         throw e;
                 }
 
+                log.info("Creating exam questions...");
                 List<ExamQuestion> examQuestions = questions.stream()
                                 .map(q -> new ExamQuestion(exam, q))
                                 .toList();
 
                 examQuestionRepository.saveAll(examQuestions);
                 exam.setExamQuestions(examQuestions);
+                log.info("Saved {} exam questions", examQuestions.size());
 
-                cacheExamSnapshot(exam, classEntity, teacher, questions);
+                log.info("Caching exam snapshot...");
+                try {
+                    cacheExamSnapshot(exam, classEntity, teacher, questions);
+                    log.info("Exam snapshot cached");
+                } catch (Exception e) {
+                    log.error("Error caching exam snapshot: {}", e.getMessage(), e);
+                    // Continue even if caching fails
+                }
+                
+                // Notify all students in the class about the new exam
+                System.out.println("=== SYSTEM.OUT: About to notify students ===");
+                System.out.flush(); // Force flush to ensure output
+                log.info("=== START: Notifying students about new exam ===");
+                log.info("About to call notifyStudentsInClass - examId={}, classId={}", exam.getExamId(), classEntity.getClassId());
+                log.info("Exam ID: {}, Exam Name: {}, Class ID: {}, Class Name: {}", 
+                        exam.getExamId(), exam.getExamName(), classEntity.getClassId(), classEntity.getClassName());
+                System.out.println("Exam ID: " + exam.getExamId() + ", Class ID: " + classEntity.getClassId());
+                try {
+                    String title = "Bài thi mới";
+                    String message = String.format("Giáo viên %s đã tạo bài thi '%s' cho lớp %s. Thời gian làm bài: %d phút. Bắt đầu: %s, Kết thúc: %s", 
+                            teacher.getFullName(), 
+                            exam.getExamName(), 
+                            classEntity.getClassName(),
+                            exam.getDurationMinutes(),
+                            exam.getStartTime() != null ? exam.getStartTime().toString() : "Chưa xác định",
+                            exam.getEndTime() != null ? exam.getEndTime().toString() : "Chưa xác định");
+                    log.info("Notification title: {}, message: {}", title, message);
+                    log.info("Calling notifyStudentsInClass with classId={}, senderId={}", classEntity.getClassId(), teacher.getUserId());
+                    notificationService.notifyStudentsInClass(
+                            classEntity.getClassId(), 
+                            title, 
+                            message, 
+                            com.example.demo.examOnline.domain.enums.NotificationType.EXAM,
+                            teacher.getUserId());
+                    log.info("=== END: Successfully completed notification process for exam {} ===", exam.getExamId());
+                } catch (Exception e) {
+                    // Log error but don't fail exam creation
+                    log.error("=== ERROR: Failed to send exam notifications for exam {} ===", exam.getExamId(), e);
+                }
+                
                 return exam;
         }
 
@@ -247,7 +309,10 @@ public class ExamService {
         }
 
         public Page<ExamResponse> getListExam(ExamFilterRequest request, Pageable pageable) {
-                return examRepository.getListExams(request.getClassId(), request.getStudentId(), pageable);
+                log.info("getListExam called with classId={}, studentId={}", request.getClassId(), request.getStudentId());
+                Page<ExamResponse> result = examRepository.getListExams(request.getClassId(), request.getStudentId(), pageable);
+                log.info("getListExam returned {} exams (page={}, size={})", result.getTotalElements(), pageable.getPageNumber(), pageable.getPageSize());
+                return result;
         }
 
         public ExamSnapshot getOrBuildExamSnapshot(Integer examId) {
