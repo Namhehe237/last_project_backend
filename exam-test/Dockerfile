@@ -15,6 +15,7 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 RUN ./mvnw clean package -DskipTests
+# force rebuild
 
 # ===== RUN STAGE =====
 FROM eclipse-temurin:21-jdk
