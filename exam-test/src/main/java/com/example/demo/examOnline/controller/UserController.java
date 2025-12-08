@@ -2,11 +2,13 @@ package com.example.demo.examOnline.controller;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.examOnline.domain.User;
@@ -34,4 +36,12 @@ public class UserController {
     public ResponseEntity<User> getUserInformationDetails(@PathVariable Integer userId) {
         return ResponseEntity.ok(userService.getUserInformationDetail(userId));
     }
+
+    @PostMapping("/teachers")
+    public ResponseEntity<?> getTeachersData(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(userService.getTeacherInformation(pageable));
+    }
+
 }

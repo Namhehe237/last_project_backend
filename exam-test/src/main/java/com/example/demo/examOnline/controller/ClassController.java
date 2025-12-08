@@ -21,6 +21,7 @@ import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
+import com.example.demo.examOnline.dto.response.CreateClassResponse;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.service.ClassService;
@@ -35,10 +36,10 @@ public class ClassController {
 
     @PostMapping("/create-class")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<String> createClass(@RequestBody CreateClassRequest request) {
-        classService.createClass(request);
+    public ResponseEntity<CreateClassResponse> createClass(@RequestBody CreateClassRequest request) {
+        CreateClassResponse response = classService.createClass(request);
 
-        return ResponseEntity.ok("Thêm lớp học thành công");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/class-detail/request/{classId}")

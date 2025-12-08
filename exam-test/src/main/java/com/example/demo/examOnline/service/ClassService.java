@@ -26,6 +26,7 @@ import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
+import com.example.demo.examOnline.dto.response.CreateClassResponse;
 import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.repository.ClassRepository;
@@ -135,7 +136,7 @@ public class ClassService {
 
                 studentClassRepository.saveAll(studentClasses);
                 classRequestRepository.deleteAllInBatch(requests);
-                
+
                 // Notify students whose requests were approved
                 for (ClassRequest req : requests) {
                     try {
@@ -143,14 +144,15 @@ public class ClassService {
                         Integer classId = req.getClassEntity().getClassId();
                         String className = req.getClassEntity().getClassName();
                         Integer teacherId = req.getClassEntity().getTeacher().getUserId();
-                        
+
                         String title = "Yêu cầu tham gia lớp được chấp nhận";
-                        String message = String.format("Yêu cầu tham gia lớp '%s' của bạn đã được giáo viên chấp nhận.", className);
-                        
+                        String message = String.format("Yêu cầu tham gia lớp '%s' của bạn đã được giáo viên chấp nhận.",
+                                className);
+
                         notificationService.notifyUser(
-                                studentId, 
-                                title, 
-                                message, 
+                                studentId,
+                                title,
+                                message,
                                 com.example.demo.examOnline.domain.enums.NotificationType.CLASS_JOIN_APPROVED,
                                 teacherId,
                                 classId);
@@ -167,7 +169,7 @@ public class ClassService {
         }
     }
 
-    public void createClass(CreateClassRequest request) {
+    public CreateClassResponse createClass(CreateClassRequest request) {
         User user = userRepository.findById(request.getTeacherId())
                 .orElseThrow(
                         () -> new RuntimeException("Không tìm thấy giáo viên id: " + request.getTeacherId()));
@@ -189,6 +191,8 @@ public class ClassService {
                 .build();
 
         classRepository.save(newClass);
+
+        return new CreateClassResponse(newClass.getClassId());
     }
 
     public void deleteClass(DeleteClassRequest request) {

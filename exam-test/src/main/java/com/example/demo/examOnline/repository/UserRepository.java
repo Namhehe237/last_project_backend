@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.domain.enums.RoleName;
+import com.example.demo.examOnline.dto.response.TeacherResponse;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 
 import java.util.List;
@@ -43,5 +44,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Query("DELETE FROM User u WHERE u.userId IN :userIds")
     void deleteUser(@Param("userIds") List<Integer> userIds);
+
+    @Query("SELECT NEW com.example.demo.examOnline.dto.response.TeacherResponse(" +
+            "u.userId, u.fullName) " +
+            "FROM User u " +
+            "WHERE u.roleName = TEACHER")
+    Page<TeacherResponse> getTeacherInformation( Pageable pageable);
 
 }
