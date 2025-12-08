@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         return ResponseEntity
                 .badRequest()
-                .body(new ErrorResponse("DATA_INTEGRITY_VIOLATION", "Dữ liệu không hợp lệ hoặc đã tồn tại"));
+                .body(new ErrorResponse("DATA_INTEGRITY_VIOLATION", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedActionException.class)
     public ResponseEntity<?> handleUnauthorizedActionException(UnauthorizedActionException ex) {
         return ResponseEntity
-                .status(403) 
+                .status(403)
                 .body(MessageResponse.builder()
                         .message(ex.getMessage())
                         .success(false)
