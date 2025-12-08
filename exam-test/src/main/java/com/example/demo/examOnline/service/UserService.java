@@ -3,6 +3,8 @@ package com.example.demo.examOnline.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.UpdateUserInformationRequest;
+import com.example.demo.examOnline.dto.response.TeacherResponse;
 import com.example.demo.examOnline.repository.UserRepository;
 
 @Service
@@ -56,9 +59,9 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public User getUserInformationDetail(Integer userId){
+    public User getUserInformationDetail(Integer userId) {
         return userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("Không có user này"));
+                .orElseThrow(() -> new RuntimeException("Không có user này"));
     }
 
     public Integer getUserIdByEmail(String email) {
@@ -73,5 +76,9 @@ public class UserService implements UserDetailsService {
         user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
     }
-    
+
+    public Page<TeacherResponse> getTeacherInformation(Pageable pageable) {
+        return userRepository.getTeacherInformation(pageable);
+    }
+
 }

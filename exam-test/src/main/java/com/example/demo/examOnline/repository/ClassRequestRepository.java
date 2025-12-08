@@ -16,7 +16,7 @@ import com.example.demo.examOnline.dto.response.RequestJoinClassResponse;
 public interface ClassRequestRepository extends JpaRepository<ClassRequest, Integer> {
 
     @Query("SELECT NEW com.example.demo.examOnline.dto.response.RequestJoinClassResponse(" +
-            " cr.requestId, cr.student.fullName) " +
+            " cr.requestId, cr.student.fullName, cr.student.email, cr.student.userCode, cr.classEntity.className, cr.classEntity.classCode, cr.requestedAt) " +
             "FROM ClassRequest cr " +
             "WHERE cr.classEntity.classId = :classId")
     Page<RequestJoinClassResponse> getRequestOfClass(@Param("classId") Integer classId, Pageable pageable);

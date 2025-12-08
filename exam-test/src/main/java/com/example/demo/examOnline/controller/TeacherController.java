@@ -33,5 +33,4 @@ public class TeacherController {
 
     private final ClassService classService;
 
-
 }
