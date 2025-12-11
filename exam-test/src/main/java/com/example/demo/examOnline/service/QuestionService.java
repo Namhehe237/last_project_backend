@@ -158,7 +158,7 @@ public class QuestionService {
 
     @Transactional
     public void deleteQuestions(List<Integer> questionIds) {
-        questionRepository.deleteByIds(questionIds);
+        questionRepository.deleteAllById(questionIds);
     }
 
     public void parseExcelFile(MultipartFile file) throws IOException {
