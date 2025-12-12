@@ -40,7 +40,7 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
 
         @Transactional
         @Modifying
-        @Query(value = "DELETE FROM STUDENT_CLASSES WHERE class_id = :classId and student_id IN (:studentIds)", nativeQuery = true)
+        @Query(value = "DELETE FROM student_classes WHERE class_id = :classId and student_id IN (:studentIds)", nativeQuery = true)
         void deleteStudentFromClass(@Param("classId") Integer classId, @Param("studentIds") List<Integer> studentIds);
 
         @Query("""
