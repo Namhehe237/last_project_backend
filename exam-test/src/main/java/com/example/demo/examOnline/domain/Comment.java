@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "COMMENTS")
 @Getter
@@ -28,10 +31,12 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "parent_comment_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment parentComment; // For threading - null if top-level comment
 
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -46,4 +51,3 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replies;
 }
-

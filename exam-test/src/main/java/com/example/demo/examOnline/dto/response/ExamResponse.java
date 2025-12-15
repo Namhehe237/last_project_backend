@@ -19,7 +19,7 @@ public class ExamResponse {
     private String className;
     private String teacherName;
     private List<Integer> questionId;
-    private LocalDateTime createdAt;
+    private LocalDateTime startTime;
 
     public ExamResponse(Integer examId, String examName, String subjectName, Integer durationMinutes,
             Integer maxAttempts, String className, String teacherName, LocalDateTime createdAt) {
@@ -30,7 +30,7 @@ public class ExamResponse {
         this.maxAttempts = maxAttempts;
         this.className = className;
         this.teacherName = teacherName;
-        this.createdAt = createdAt;
+        this.startTime = createdAt;
         this.questionId = null;
     }
 
@@ -42,6 +42,17 @@ public class ExamResponse {
         this.durationMinutes = durationMinutes;
         this.className = className;
         this.teacherName = teacherName;
+    }
+
+    public ExamResponse(Integer examId, String examName, String subjectName, Integer durationMinutes, String className,
+            String teacherName, LocalDateTime startTime) {
+        this.examId = examId;
+        this.examName = examName;
+        this.subjectName = subjectName;
+        this.durationMinutes = durationMinutes;
+        this.className = className;
+        this.teacherName = teacherName;
+        this.startTime = startTime;
     }
 
 }

@@ -9,9 +9,9 @@ cloudinary:
 
 spring:
   datasource:
-    url: ${RAILWAY_MYSQL_URL:jdbc:mysql://localhost:3306/online_exam_platform?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
-    username: ${RAILWAY_MYSQL_USER:root}
-    password: ${RAILWAY_MYSQL_PASSWORD:Thanhnam2307}
+    url: jdbc:mysql://yamabiko.proxy.rlwy.net:22679/railway
+    username: root
+    password: RMUWNjSUuLUyvuCXHrVUxAAXNdvrYMka
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     serialization:
@@ -28,7 +28,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update # create | update | validate | none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.NotificationType;
 
 @Entity
@@ -34,13 +37,16 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user; // người nhận
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Classes classEntity;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    private User sender; // người gửi
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User sender;
 }

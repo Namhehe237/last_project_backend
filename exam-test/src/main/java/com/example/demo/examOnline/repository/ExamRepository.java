@@ -1,5 +1,6 @@
 package com.example.demo.examOnline.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.*;
@@ -26,26 +27,28 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
   @Query("""
       SELECT DISTINCT NEW com.example.demo.examOnline.dto.response.ExamResponse(
         e.examId, e.examName, e.subjectName, e.durationMinutes,
-        e.classEntity.className, e.teacher.fullName
+        e.classEntity.className, e.teacher.fullName, e.startTime
       )
       FROM Exam e
       WHERE (:classId IS NULL OR e.classEntity.classId = :classId)
         AND (:studentId IS NULL OR e.classEntity.classId IN (
-          SELECT sc.classEntity.classId 
-          FROM StudentClass sc 
+          SELECT sc.classEntity.classId
+          FROM StudentClass sc
           WHERE sc.student.userId = :studentId
         ))
         AND (:studentId IS NULL OR NOT EXISTS (
-          SELECT 1 FROM StudentExam se 
-          WHERE se.exam.examId = e.examId 
+          SELECT 1 FROM StudentExam se
+          WHERE se.exam.examId = e.examId
             AND se.student.userId = :studentId
-            AND se.status IN (com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED, 
+            AND se.status IN (com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED,
                               com.example.demo.examOnline.domain.enums.StudentExamStatus.GRADED)
         ))
+        AND e.startTime < :checkTime
       """)
   Page<ExamResponse> getListExams(
       @Param("classId") Integer classId,
       @Param("studentId") Integer studentId,
+      @Param("checkTime") LocalDateTime checkTime,
       Pageable pageable);
 
   @Query("SELECT e FROM Exam e WHERE e.teacher.userId = :teacherId")

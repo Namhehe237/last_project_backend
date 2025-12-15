@@ -1,6 +1,7 @@
 package com.example.demo.examOnline.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -327,7 +328,10 @@ public class ExamService {
         public Page<ExamResponse> getListExam(ExamFilterRequest request, Pageable pageable) {
                 log.info("getListExam called with classId={}, studentId={}", request.getClassId(),
                                 request.getStudentId());
+                LocalDateTime now = LocalDateTime.now();
+                System.out.println(now);
                 Page<ExamResponse> result = examRepository.getListExams(request.getClassId(), request.getStudentId(),
+                                now,
                                 pageable);
                 log.info("getListExam returned {} exams (page={}, size={})", result.getTotalElements(),
                                 pageable.getPageNumber(), pageable.getPageSize());
