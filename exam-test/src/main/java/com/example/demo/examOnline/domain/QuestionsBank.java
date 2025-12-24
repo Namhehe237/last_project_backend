@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.DifficultyLevel;
 import com.example.demo.examOnline.domain.enums.QuestionType;
 
@@ -41,6 +44,7 @@ public class QuestionsBank {
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     private LocalDateTime createdAt;

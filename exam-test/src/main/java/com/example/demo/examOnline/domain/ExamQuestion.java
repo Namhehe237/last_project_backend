@@ -1,5 +1,8 @@
 package com.example.demo.examOnline.domain;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,11 +24,13 @@ public class ExamQuestion {
     @ManyToOne
     @MapsId("examId")
     @JoinColumn(name = "exam_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Exam exam;
 
     @ManyToOne
     @MapsId("questionId")
     @JoinColumn(name = "question_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private QuestionsBank question;
 
     public ExamQuestion(Exam exam, QuestionsBank question) {

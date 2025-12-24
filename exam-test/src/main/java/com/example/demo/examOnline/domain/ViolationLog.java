@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.ViolationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -27,10 +30,12 @@ public class ViolationLog {
 
     @ManyToOne
     @JoinColumn(name = "exam_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Exam exam;
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User student;
 
     @Enumerated(EnumType.STRING)
@@ -54,4 +59,3 @@ public class ViolationLog {
         }
     }
 }
-

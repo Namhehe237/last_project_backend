@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "STUDENT_CLASSES")
 @Getter
@@ -23,11 +26,13 @@ public class StudentClass {
     @ManyToOne
     @MapsId("studentId")
     @JoinColumn(name = "student_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User student;
 
     @ManyToOne
     @MapsId("classId")
     @JoinColumn(name = "class_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Classes classEntity;
 
     private LocalDateTime joinedAt;

@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.PostType;
 
 @Entity
@@ -26,10 +29,12 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Classes classEntity;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     @Column(nullable = false, length = 500)
@@ -63,4 +68,3 @@ public class Post {
     @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssignmentSubmission> submissions;
 }
-

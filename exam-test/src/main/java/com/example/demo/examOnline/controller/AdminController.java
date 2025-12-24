@@ -16,12 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.examOnline.dto.request.CreateUserRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.GetUserListRequest;
-import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
 import com.example.demo.examOnline.dto.response.UserResponseDTO;
 import com.example.demo.examOnline.service.AdminService;
-import com.example.demo.examOnline.service.ClassService;
-import com.example.demo.examOnline.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,9 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final UserService userService;
     private final AdminService adminService;
-    private final ClassService classService;
 
     @PostMapping("/list-user")
     @PreAuthorize("hasRole('ADMIN')")

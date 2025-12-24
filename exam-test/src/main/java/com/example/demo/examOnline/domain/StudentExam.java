@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.StudentExamStatus;
 
 @Entity
@@ -25,13 +28,13 @@ public class StudentExam {
 
     @Column(name = "start_time")
     private LocalDateTime startTime;
-    
+
     @Column(name = "end_time")
     private LocalDateTime submitTime;
-    
+
     private Double score;
     private Integer attemptNumber;
-    
+
     @Column(name = "video_url")
     private String videoUrl; // URL of recorded video on Cloudinary
 
@@ -41,11 +44,13 @@ public class StudentExam {
     @ManyToOne
     @MapsId("studentId")
     @JoinColumn(name = "student_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User student;
 
     @ManyToOne
     @MapsId("examId")
     @JoinColumn(name = "exam_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Exam exam;
 
     @OneToMany(mappedBy = "studentExam", cascade = CascadeType.ALL)
