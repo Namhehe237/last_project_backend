@@ -3,7 +3,8 @@ package com.example.demo.examOnline.controller;
 import com.example.demo.examOnline.dto.request.CreatePostRequest;
 import com.example.demo.examOnline.dto.response.PostResponseDTO;
 import com.example.demo.examOnline.service.PostService;
-import com.example.demo.examOnline.service.UserService;
+import com.example.demo.examOnline.service.impl.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

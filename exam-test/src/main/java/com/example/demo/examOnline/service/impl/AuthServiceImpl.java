@@ -14,7 +14,6 @@ import com.example.demo.examOnline.dto.request.AuthRequest;
 import com.example.demo.examOnline.dto.response.AuthResponse;
 import com.example.demo.examOnline.repository.UserRepository;
 import com.example.demo.examOnline.service.AuthService;
-import com.example.demo.examOnline.service.JwtService;
 import com.example.demo.examOnline.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;

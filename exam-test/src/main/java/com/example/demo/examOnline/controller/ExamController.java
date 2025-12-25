@@ -35,8 +35,8 @@ import com.example.demo.examOnline.dto.response.ExamResultDetailResponse;
 import com.example.demo.examOnline.dto.response.RandomExamResponse;
 import com.example.demo.examOnline.dto.request.UpdateExamQuestionsRequest;
 import com.example.demo.examOnline.service.ExamService;
+import com.example.demo.examOnline.service.impl.UserService;
 import com.example.demo.examOnline.service.CloudinaryService;
-import com.example.demo.examOnline.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 

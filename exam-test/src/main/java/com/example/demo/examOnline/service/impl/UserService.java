@@ -1,4 +1,4 @@
-package com.example.demo.examOnline.service;
+package com.example.demo.examOnline.service.impl;
 
 import lombok.RequiredArgsConstructor;
 

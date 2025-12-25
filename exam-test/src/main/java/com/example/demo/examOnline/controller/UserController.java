@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.examOnline.domain.User;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.request.UpdateUserInformationRequest;
-import com.example.demo.examOnline.service.UserService;
+import com.example.demo.examOnline.service.impl.UserService;
 
 import lombok.RequiredArgsConstructor;
 
