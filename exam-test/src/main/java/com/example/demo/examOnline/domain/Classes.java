@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.io.Serializable;
 
 @Entity
@@ -19,7 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Classes  {
+public class Classes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer classId;
@@ -33,6 +36,7 @@ public class Classes  {
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher; // tham chiếu đến USERS
 
     private LocalDateTime createdAt;

@@ -1,46 +1,14 @@
 package com.example.demo.examOnline.service;
 
-import java.time.Duration;
-
-import org.springframework.cache.*;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
 import com.example.demo.examOnline.dto.cache.ExamSnapshot;
 
-import lombok.RequiredArgsConstructor;
+public interface ExamCacheService {
 
-@Service
-@RequiredArgsConstructor
-public class ExamCacheService {
+    public ExamSnapshot cacheExam(Integer examId, ExamSnapshot snapshot);
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    public ExamSnapshot getExamFromCache(Integer examId);
 
-    private static final String KEY_PREFIX = "exam:snapshot:";
-    private static final Duration DEFAULT_TTL = Duration.ofHours(6);
+    public ExamSnapshot getExam(Integer examId);
 
-    @Cacheable(value = "exam", key = "'exam_detail_' + #examId")
-    public ExamSnapshot cacheExam(Integer examId, ExamSnapshot snapshot) {
-        return snapshot;
-    }
-
-    private final CacheManager cacheManager;
-
-    public ExamSnapshot getExamFromCache(Integer examId) {
-        Cache cache = cacheManager.getCache("exam"); 
-        if (cache != null) {
-            return cache.get("exam_detail_" + examId, ExamSnapshot.class);
-        }
-        return null;
-    }
-
-    public ExamSnapshot getExam(Integer examId) {
-        Object value = redisTemplate.opsForValue().get(KEY_PREFIX + examId);
-        return (value instanceof ExamSnapshot) ? (ExamSnapshot) value : null;
-    }
-
-    public void evictExam(Integer examId) {
-        redisTemplate.delete(KEY_PREFIX + examId);
-    }
+    public void evictExam(Integer examId);
 }

@@ -16,7 +16,6 @@ import com.example.demo.examOnline.domain.enums.RoleName;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.io.Serializable;
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_user_email", columnList = "email"),
@@ -26,7 +25,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User implements UserDetails, Serializable {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,7 +4,8 @@ import com.example.demo.examOnline.dto.request.CreateCommentRequest;
 import com.example.demo.examOnline.dto.request.UpdateCommentRequest;
 import com.example.demo.examOnline.dto.response.CommentResponseDTO;
 import com.example.demo.examOnline.service.CommentService;
-import com.example.demo.examOnline.service.UserService;
+import com.example.demo.examOnline.service.impl.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

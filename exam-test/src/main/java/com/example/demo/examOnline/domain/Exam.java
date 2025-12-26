@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.demo.examOnline.domain.enums.ExamStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -29,13 +32,13 @@ public class Exam {
     private String subjectName;
     private Integer durationMinutes;
     private Double totalScore;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endTime;
-    
+
     private Boolean shuffleQuestions;
     private Boolean shuffleAnswers;
     private Integer maxAttempts;
@@ -45,16 +48,18 @@ public class Exam {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Classes classEntity;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
