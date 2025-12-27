@@ -6,8 +6,10 @@ import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,43 +37,44 @@ public class RedisController {
         return ResponseEntity.ok("ok");
     }
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    @Qualifier("redisTemplateForgotPassword")
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    @GetMapping("/redis/test")
-    public ResponseEntity<?> testRedis() {
-        try {
+    // @GetMapping("/redis/test")
+    // public ResponseEntity<?> testRedis() {
+    // try {
 
-            // Test connection
-            RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
-            String pong = connection.ping();
-            System.out.println("PING response: {}" + pong);
-            connection.close();
+    // // Test connection
+    // RedisConnection connection =
+    // redisTemplate.getConnectionFactory().getConnection();
+    // String pong = connection.ping();
+    // System.out.println("PING response: {}" + pong);
+    // connection.close();
 
-            // Test set/get
-            redisTemplate.opsForValue().set("test_key", "hello", Duration.ofSeconds(5));
-            String value = redisTemplate.opsForValue().get("test_key");
+    // // Test set/get
+    // redisTemplate.opsForValue().set("test_key", "hello", Duration.ofSeconds(5));
+    // String value = redisTemplate.opsForValue().get("test_key");
 
-            return ResponseEntity.ok(Map.of(
-                    "connected", true,
-                    "ping", pong,
-                    "value", value));
-        } catch (Exception e) {
-            System.out.println("Redis connection failed" + e);
+    // return ResponseEntity.ok(Map.of(
+    // "connected", true,
+    // "ping", pong,
+    // "value", value));
+    // } catch (Exception e) {
+    // System.out.println("Redis connection failed" + e);
 
-            // In ra full stack trace
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
+    // // In ra full stack trace
+    // StringWriter sw = new StringWriter();
+    // PrintWriter pw = new PrintWriter(sw);
+    // e.printStackTrace(pw);
 
-            return ResponseEntity.status(500).body(Map.of(
-                    "connected", false,
-                    "error", e.getMessage(),
-                    "errorType", e.getClass().getName(),
-                    "cause", e.getCause() != null ? e.getCause().getMessage() : "null",
-                    "stackTrace", sw.toString()));
-        }
-    }
+    // return ResponseEntity.status(500).body(Map.of(
+    // "connected", false,
+    // "error", e.getMessage(),
+    // "errorType", e.getClass().getName(),
+    // "cause", e.getCause() != null ? e.getCause().getMessage() : "null",
+    // "stackTrace", sw.toString()));
+    // }
+    // }
 
     private final ExamCacheService examCacheService;
 
@@ -83,6 +86,12 @@ public class RedisController {
                     .body("Exam cache not found for id: " + examId);
         }
         return ResponseEntity.ok(snapshot);
+    }
+
+    @PostMapping("/test")
+    public ResponseEntity<?> test() {
+        redisTemplate.opsForValue().set("test_key", "hello", Duration.ofSeconds(1000));
+        return ResponseEntity.ok("ok");
     }
 
 }

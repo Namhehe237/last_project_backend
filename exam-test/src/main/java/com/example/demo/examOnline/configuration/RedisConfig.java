@@ -37,16 +37,15 @@ public class RedisConfig {
         @Value("${spring.data.redis.port}")
         private int port;
 
-        @Value("${spring.data.redis.password}")
-        private String password;
+        // @Value("${spring.data.redis.password}")
+        // private String password;
 
-        @Value("${spring.data.redis.username}")
-        private String username;
+        // @Value("${spring.data.redis.username}")
+        // private String username;
 
         @Bean(name = "redisForgotPassword")
         public LettuceConnectionFactory redisForgotPassword() {
                 RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
-                configuration.setPassword(password);
                 // configuration.setDatabase(REDIS_INDEX_FORGOT_PASSWORD);
                 return new LettuceConnectionFactory(configuration);
         }
