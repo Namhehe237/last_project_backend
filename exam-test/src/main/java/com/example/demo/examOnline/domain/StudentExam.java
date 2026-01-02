@@ -29,14 +29,19 @@ public class StudentExam {
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "submit_time")
     private LocalDateTime submitTime;
 
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
     private Double score;
+
+    @Column(name = "attempt_number")
     private Integer attemptNumber;
 
     @Column(name = "video_url")
-    private String videoUrl; // URL of recorded video on Cloudinary
+    private String videoUrl; // Video recording for proctoring
 
     @Enumerated(EnumType.STRING)
     private StudentExamStatus status;

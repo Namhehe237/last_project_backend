@@ -35,5 +35,6 @@ public class StudentClass {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Classes classEntity;
 
+    @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 }

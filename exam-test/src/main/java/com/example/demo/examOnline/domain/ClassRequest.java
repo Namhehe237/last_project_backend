@@ -34,5 +34,6 @@ public class ClassRequest {
     @JoinColumn(name = "class_id")
     private Classes classEntity;
 
+    @Column(name = "requested_at")
     private LocalDateTime requestedAt;
 }

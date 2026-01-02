@@ -35,6 +35,7 @@ public class QuestionsBank {
     private QuestionType questionType;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
 
     private String imageUrl;
@@ -47,9 +48,13 @@ public class QuestionsBank {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Answer> answers = new ArrayList<>();
 }
