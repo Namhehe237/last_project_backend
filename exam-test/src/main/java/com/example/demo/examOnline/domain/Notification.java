@@ -32,7 +32,10 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
 
+    @Column(name = "is_read")
     private Boolean isRead;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @ManyToOne

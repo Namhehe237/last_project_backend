@@ -1,4 +1,0 @@
--- Add earned_points column to ASSIGNMENT_SUBMISSIONS table
-ALTER TABLE ASSIGNMENT_SUBMISSIONS
-ADD COLUMN earned_points DOUBLE NULL;
-

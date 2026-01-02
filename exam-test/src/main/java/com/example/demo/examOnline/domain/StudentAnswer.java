@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "STUDENT_ANSWERS")
 @Getter
@@ -20,7 +22,7 @@ import lombok.Setter;
 public class StudentAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answer_id")
+    @Column(name = "student_answer_id")
     private Integer studentAnswerId;
 
     @ManyToOne
@@ -47,6 +49,9 @@ public class StudentAnswer {
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
-    @Column(name = "points_earned")
-    private Double scoreEarned;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

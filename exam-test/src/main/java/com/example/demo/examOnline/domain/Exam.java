@@ -34,9 +34,11 @@ public class Exam {
     private Double totalScore;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "end_time")
     private LocalDateTime endTime;
 
     private Boolean shuffleQuestions;
@@ -47,9 +49,11 @@ public class Exam {
     private ExamStatus status;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @ManyToOne

@@ -13,8 +13,6 @@ import java.util.List;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name = "CLASSES")
 @Getter
@@ -39,7 +37,14 @@ public class Classes {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher; // tham chiếu đến USERS
 
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "classEntity", cascade = CascadeType.ALL)
