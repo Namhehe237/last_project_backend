@@ -130,7 +130,7 @@ public class ClassManagementServiceImpl implements ClassManagementService {
      * Lấy danh sách lớp học của học sinh theo studentId
      */
     @Override
-    public List<ClassResponseDTO> getStudentClasses(Integer studentId) {
+    public List<ClassResponseDTO> getStudentClasses(Integer studentId, Boolean includeArchived) {
         try {
             // Kiểm tra studentId có tồn tại không
             Optional<User> student = userRepository.findById(studentId);
@@ -139,6 +139,19 @@ public class ClassManagementServiceImpl implements ClassManagementService {
             }
 
             List<StudentClass> studentClasses = studentClassRepository.findByStudentId(studentId);
+
+            // Filter theo isActive nếu includeArchived được chỉ định
+            if (includeArchived != null) {
+                boolean showActive = !includeArchived;
+                studentClasses = studentClasses.stream()
+                        .filter(sc -> showActive ? sc.getClassEntity().getIsActive() : !sc.getClassEntity().getIsActive())
+                        .collect(Collectors.toList());
+            } else {
+                // Mặc định chỉ hiển thị lớp đang hoạt động
+                studentClasses = studentClasses.stream()
+                        .filter(sc -> sc.getClassEntity().getIsActive())
+                        .collect(Collectors.toList());
+            }
 
             return studentClasses.stream()
                     .map(this::convertToClassResponseDTO)

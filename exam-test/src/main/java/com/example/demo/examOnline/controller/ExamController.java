@@ -137,8 +137,10 @@ public class ExamController {
 
     @GetMapping("/paper/{examId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
-    public ResponseEntity<ExamPaperResponse> getExamPaper(@PathVariable Integer examId) {
-        return ResponseEntity.ok(examService.getExamPaper(examId));
+    public ResponseEntity<ExamPaperResponse> getExamPaper(
+            @PathVariable Integer examId,
+            @RequestParam(required = false) Integer studentId) {
+        return ResponseEntity.ok(examService.getExamPaper(examId, studentId));
     }
 
     @PostMapping("/grade")
@@ -175,7 +177,7 @@ public class ExamController {
             
             String folder = String.format("exam-recordings/exam-%d/student-%d", examId, studentId);
             String videoUrl = cloudinaryService.uploadVideo(videoFile, folder);
-            // Save video URL to StudentExam
+
             examService.saveVideoUrl(examId, studentId, videoUrl);
             log.info("Video uploaded successfully - URL: {}", videoUrl);
             return ResponseEntity.ok(videoUrl);

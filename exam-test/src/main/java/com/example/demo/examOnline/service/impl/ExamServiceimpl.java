@@ -4,7 +4,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -166,6 +168,8 @@ public class ExamServiceimpl implements ExamService {
                                 .status(request.getExamStatus())
                                 .startTime(request.getStartTime())
                                 .endTime(request.getEndTime())
+                                .shuffleQuestions(request.getShuffleQuestions() != null ? request.getShuffleQuestions() : false)
+                                .shuffleAnswers(request.getShuffleAnswers() != null ? request.getShuffleAnswers() : false)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -274,10 +278,21 @@ public class ExamServiceimpl implements ExamService {
 
                 if (questions.size() < count) {
                         throw new IllegalArgumentException(
-                                        String.format("Not enough %s questions available", level.name()));
+                                        String.format("Không đủ số câu hỏi loại %s trong ngân hàng", getDifficultyLevelVietnamese(level)));         
                 }
 
                 return questions;
+        }
+
+        private String getDifficultyLevelVietnamese(DifficultyLevel level) {
+                if (level == null) {
+                        return "không xác định";
+                }
+                return switch (level) {
+                        case EASY -> "dễ";
+                        case MEDIUM -> "trung bình";
+                        case HARD -> "khó";
+                };
         }
 
         private void cacheExamSnapshot(Exam exam, Classes classEntity, User teacher, List<QuestionsBank> questions) {
@@ -291,6 +306,8 @@ public class ExamServiceimpl implements ExamService {
                                 .teacherName(teacher != null ? teacher.getFullName() : null)
                                 .startTime(exam.getStartTime())
                                 .endTime(exam.getEndTime())
+                                .shuffleQuestions(exam.getShuffleQuestions())
+                                .shuffleAnswers(exam.getShuffleAnswers())
                                 .questions(questions.stream().map(q -> QuestionSnapshot.builder()
                                                 .questionId(q.getQuestionId())
                                                 .questionText(q.getQuestionText())
@@ -370,6 +387,8 @@ public class ExamServiceimpl implements ExamService {
                                 .teacherName(exam.getTeacher() != null ? exam.getTeacher().getFullName() : null)
                                 .startTime(exam.getStartTime())
                                 .endTime(exam.getEndTime())
+                                .shuffleQuestions(exam.getShuffleQuestions())
+                                .shuffleAnswers(exam.getShuffleAnswers())
                                 .questions(questions.stream().map(q -> QuestionSnapshot.builder()
                                                 .questionId(q.getQuestionId())
                                                 .questionText(q.getQuestionText())
@@ -391,8 +410,40 @@ public class ExamServiceimpl implements ExamService {
         }
 
         @Override
-        public ExamPaperResponse getExamPaper(Integer examId) {
+        public ExamPaperResponse getExamPaper(Integer examId, Integer studentId) {
                 ExamSnapshot s = getOrBuildExamSnapshot(examId);
+                
+                // Create a new Random instance for each request to ensure different ordering each time
+                Random random = new Random();
+                List<QuestionSnapshot> questions = new ArrayList<>(s.getQuestions());
+                
+                // Shuffle questions if enabled (random order each time)
+                if (Boolean.TRUE.equals(s.getShuffleQuestions())) {
+                        Collections.shuffle(questions, random);
+                }
+                
+                // Map questions to response, shuffling answers if enabled
+                List<QuestionPaperResponse> questionResponses = questions.stream().map(q -> {
+                        List<AnswerSnapshot> answers = new ArrayList<>(q.getAnswers());
+                        
+                        // Shuffle answers if enabled (random order each time)
+                        if (Boolean.TRUE.equals(s.getShuffleAnswers())) {
+                                Random answerRandom = new Random();
+                                Collections.shuffle(answers, answerRandom);
+                        }
+                        
+                        return QuestionPaperResponse.builder()
+                                        .questionId(q.getQuestionId())
+                                        .questionText(q.getQuestionText())
+                                        .questionType(q.getQuestionType())
+                                        .difficultyLevel(q.getDifficultyLevel())
+                                        .answers(answers.stream().map(a -> AnswerPaperResponse.builder()
+                                                        .answerId(a.getAnswerId())
+                                                        .answerText(a.getAnswerText())
+                                                        .build()).toList())
+                                        .build();
+                }).toList();
+                
                 return ExamPaperResponse.builder()
                                 .examId(s.getExamId())
                                 .examName(s.getExamName())
@@ -400,16 +451,7 @@ public class ExamServiceimpl implements ExamService {
                                 .durationMinutes(s.getDurationMinutes())
                                 .startTime(s.getStartTime())
                                 .endTime(s.getEndTime())
-                                .questions(s.getQuestions().stream().map(q -> QuestionPaperResponse.builder()
-                                                .questionId(q.getQuestionId())
-                                                .questionText(q.getQuestionText())
-                                                .questionType(q.getQuestionType())
-                                                .difficultyLevel(q.getDifficultyLevel())
-                                                .answers(q.getAnswers().stream().map(a -> AnswerPaperResponse.builder()
-                                                                .answerId(a.getAnswerId())
-                                                                .answerText(a.getAnswerText())
-                                                                .build()).toList())
-                                                .build()).toList())
+                                .questions(questionResponses)
                                 .build();
         }
 
@@ -444,7 +486,6 @@ public class ExamServiceimpl implements ExamService {
 
                 double score = total == 0 ? 0.0 : Math.round((correct * 10.0 / total) * 100.0) / 100.0;
 
-                // Save score and submitTime to StudentExam, and save student answers
                 saveExamResult(request.getExamId(), request.getStudentId(), score, total, correct, details);
 
                 return GradeExamResponse.builder()
@@ -642,9 +683,11 @@ public class ExamServiceimpl implements ExamService {
                 List<StudentAnswer> studentAnswers = studentAnswerRepository.findByStudentIdAndExamId(studentId,
                                 examId);
                 var answerMap = studentAnswers.stream()
+                                .filter(sa -> sa.getQuestion() != null)
                                 .collect(java.util.stream.Collectors.toMap(
                                                 sa -> sa.getQuestion().getQuestionId(),
-                                                sa -> sa));
+                                                sa -> sa,
+                                                (existing, replacement) -> existing));
 
                 List<ExamResultDetailResponse.QuestionResultDetail> questionDetails = examSnapshot.getQuestions()
                                 .stream()
@@ -655,11 +698,12 @@ public class ExamServiceimpl implements ExamService {
                                                                         ? studentAnswer.getChosenAnswer().getAnswerId()
                                                                         : null;
                                         Integer correctAnswerId = q.getAnswers().stream()
-                                                        .filter(a -> a.isCorrect())
+                                                        .filter(a -> Boolean.TRUE.equals(a.isCorrect()))
                                                         .map(a -> a.getAnswerId())
                                                         .findFirst()
                                                         .orElse(null);
-                                        Boolean isCorrect = studentAnswer != null ? studentAnswer.getIsCorrect()
+                                        Boolean isCorrect = (studentAnswer != null && studentAnswer.getIsCorrect() != null)
+                                                        ? studentAnswer.getIsCorrect()
                                                         : false;
 
                                         List<ExamResultDetailResponse.AnswerDetail> answerDetails = q.getAnswers()
@@ -667,7 +711,7 @@ public class ExamServiceimpl implements ExamService {
                                                         .map(a -> ExamResultDetailResponse.AnswerDetail.builder()
                                                                         .answerId(a.getAnswerId())
                                                                         .answerText(a.getAnswerText())
-                                                                        .isCorrect(a.isCorrect())
+                                                                        .isCorrect(Boolean.TRUE.equals(a.isCorrect()))
                                                                         .build())
                                                         .toList();
 
@@ -683,7 +727,9 @@ public class ExamServiceimpl implements ExamService {
                                 .toList();
 
                 int totalQuestions = examSnapshot.getQuestions().size();
-                int correctAnswers = (int) questionDetails.stream().filter(q -> q.getIsCorrect()).count();
+                int correctAnswers = (int) questionDetails.stream()
+                                .filter(q -> Boolean.TRUE.equals(q.getIsCorrect()))
+                                .count();
 
                 return ExamResultDetailResponse.builder()
                                 .examId(examId)

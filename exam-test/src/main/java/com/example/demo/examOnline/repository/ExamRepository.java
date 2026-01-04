@@ -43,7 +43,8 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
             AND se.status IN (com.example.demo.examOnline.domain.enums.StudentExamStatus.SUBMITTED,
                               com.example.demo.examOnline.domain.enums.StudentExamStatus.GRADED)
         ))
-        AND e.startTime < :checkTime
+        AND e.startTime < :checkTime 
+        AND (e.endTime IS NULL OR e.endTime > :checkTime)
       """)
   Page<ExamResponse> getListExams(
       @Param("classId") Integer classId,

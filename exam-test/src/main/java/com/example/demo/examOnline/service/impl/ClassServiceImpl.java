@@ -21,6 +21,7 @@ import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
+import com.example.demo.examOnline.dto.request.UpdateClassActiveStatusRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -74,14 +75,14 @@ public class ClassServiceImpl implements ClassService {
         if (request.getDescription() != null)
             classes.setDescription(request.getDescription());
 
+        classes.setUpdatedAt(LocalDateTime.now());
         classRepository.save(classes);
     }
 
     @Override
-    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId, Pageable pageable) {
-
-        Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId, pageable);
-
+    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId, Boolean includeArchived, Pageable pageable) {
+        Boolean includeArchivedValue = (includeArchived != null) ? includeArchived : false;
+        Page<ClassResponseDTO> listClasses = classRepository.findClassOfTeacher(teacherId, includeArchivedValue, pageable);
         return listClasses;
     }
 
@@ -210,6 +211,19 @@ public class ClassServiceImpl implements ClassService {
         }
 
         classRepository.deleteClass(request.getClassId());
+    }
+
+    @Override
+    @Transactional
+    public void updateClassActiveStatus(Integer classId, UpdateClassActiveStatusRequest request) {
+        Classes classes = classRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy class với id : " + classId));
+
+        if (request.getIsActive() != null) {
+            classes.setIsActive(request.getIsActive());
+            classes.setUpdatedAt(LocalDateTime.now());
+            classRepository.save(classes);
+        }
     }
 
 }

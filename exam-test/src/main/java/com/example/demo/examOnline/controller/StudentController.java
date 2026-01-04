@@ -90,7 +90,10 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<ClassResponseDTO>> getMyClasses(@Valid @RequestBody GetStudentClassesRequest request) {
         try {
-            List<ClassResponseDTO> classes = classManagementService.getStudentClasses(request.getStudentId());
+            List<ClassResponseDTO> classes = classManagementService.getStudentClasses(
+                request.getStudentId(), 
+                request.getIncludeArchived() != null ? request.getIncludeArchived() : false
+            );
             return ResponseEntity.ok(classes);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

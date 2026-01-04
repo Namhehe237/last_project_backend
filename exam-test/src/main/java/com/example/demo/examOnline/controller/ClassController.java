@@ -18,6 +18,7 @@ import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
+import com.example.demo.examOnline.dto.request.UpdateClassActiveStatusRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -96,11 +97,12 @@ public class ClassController {
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<Page<ClassResponseDTO>> getListClassOfTeacher(@PathVariable Integer teacherId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeArchived) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, pageable);
+        Page<ClassResponseDTO> listClasses = classService.getClassOfTeacher(teacherId, includeArchived, pageable);
 
         return ResponseEntity.ok(listClasses);
     }
@@ -119,6 +121,16 @@ public class ClassController {
         classService.deleteStudentFromClass(classId, request);
 
         return ResponseEntity.ok("Xóa student khỏi class thành công");
+    }
+
+    @PostMapping("/update-active-status/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<String> updateClassActiveStatus(@PathVariable Integer classId,
+            @RequestBody UpdateClassActiveStatusRequest request) {
+
+        classService.updateClassActiveStatus(classId, request);
+
+        return ResponseEntity.ok("Cập nhật trạng thái lớp học thành công");
     }
 
 }

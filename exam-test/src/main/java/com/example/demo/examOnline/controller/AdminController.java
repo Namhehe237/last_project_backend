@@ -43,9 +43,10 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ClassResponseDTO>> getListClass(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeArchived) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(adminService.getClassList(pageable));
+        return ResponseEntity.ok(adminService.getClassList(includeArchived, pageable));
 
     }
 

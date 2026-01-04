@@ -24,4 +24,6 @@ public class CreateExamRequest {
     private ExamStatus examStatus;
     private Integer teacherId;
     private List<Integer> questionId;
+    private Boolean shuffleQuestions;
+    private Boolean shuffleAnswers;
 }

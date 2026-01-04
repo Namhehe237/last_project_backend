@@ -38,8 +38,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<ClassResponseDTO> getClassList(Pageable pageable) {
-        return classRepository.getListClass(pageable);
+    public Page<ClassResponseDTO> getClassList(Boolean includeArchived, Pageable pageable) {
+        Boolean includeArchivedValue = (includeArchived != null) ? includeArchived : false;
+        return classRepository.getListClass(includeArchivedValue, pageable);
     }
 
     @Override

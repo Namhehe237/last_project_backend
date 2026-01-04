@@ -27,7 +27,7 @@ public interface ClassManagementService {
 
     public MessageResponse requestJoinClass(RequestJoinClassRequest request);
 
-    public List<ClassResponseDTO> getStudentClasses(Integer studentId);
+    public List<ClassResponseDTO> getStudentClasses(Integer studentId, Boolean includeArchived);
 
     public MessageResponse leaveClass(Integer studentId, Integer classId);
 
