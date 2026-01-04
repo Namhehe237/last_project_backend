@@ -25,6 +25,8 @@ public class ExamSnapshot implements Serializable {
     private String teacherName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Boolean shuffleQuestions;
+    private Boolean shuffleAnswers;
     private List<QuestionSnapshot> questions;
 }
 

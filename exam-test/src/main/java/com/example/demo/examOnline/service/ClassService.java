@@ -9,6 +9,7 @@ import com.example.demo.examOnline.dto.request.CreateClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteClassRequest;
 import com.example.demo.examOnline.dto.request.DeleteUserRequest;
 import com.example.demo.examOnline.dto.request.HandleJoinRequestRequest;
+import com.example.demo.examOnline.dto.request.UpdateClassActiveStatusRequest;
 import com.example.demo.examOnline.dto.request.UpdateClassInformationRequest;
 import com.example.demo.examOnline.dto.response.ClassOptionResponse;
 import com.example.demo.examOnline.dto.response.ClassResponseDTO;
@@ -22,9 +23,11 @@ public interface ClassService {
 
     public void updateClassInfomationDetail(Integer classId, UpdateClassInformationRequest request);
 
-    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId, Pageable pageable);
+    public Page<ClassResponseDTO> getClassOfTeacher(Integer teacherId, Boolean includeArchived, Pageable pageable);
 
     public List<ClassOptionResponse> getClassOptions(Integer teacherId);
+
+    public void updateClassActiveStatus(Integer classId, UpdateClassActiveStatusRequest request);
 
     public Page<UserResponseDTO> getStudentOfClass(Integer classId, Pageable pageable);
 

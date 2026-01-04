@@ -29,8 +29,12 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         ClassResponseDTO getClassInformationDetail(@Param("classId") Integer classId);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
-                        "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.email, c.createdAt, null, null) FROM Classes c WHERE c.teacher.userId =:teacherId")
-        Page<ClassResponseDTO> findClassOfTeacher(@Param("teacherId") Integer teacherId, Pageable pageable);
+                        "c.classId, c.className, c.classCode, c.description, c.teacher.fullName, c.teacher.email, c.createdAt, null, null) " +
+                        "FROM Classes c " +
+                        "WHERE c.teacher.userId = :teacherId " +
+                        "AND ((:includeArchived = false AND c.isActive = true) OR (:includeArchived = true AND c.isActive = false))")
+        Page<ClassResponseDTO> findClassOfTeacher(@Param("teacherId") Integer teacherId, 
+                        @Param("includeArchived") Boolean includeArchived, Pageable pageable);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.UserResponseDTO(" +
                         "u.userId, u.email, u.fullName, u.phoneNumber) " +
@@ -55,8 +59,9 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassResponseDTO(" +
                         "c.classId, c.className, c.classCode, c.description, " +
                         "c.teacher.fullName, c.teacher.email, c.createdAt) " +
-                        "FROM Classes c")
-        Page<ClassResponseDTO> getListClass(Pageable pageable);
+                        "FROM Classes c " +
+                        "WHERE ((:includeArchived = false AND c.isActive = true) OR (:includeArchived = true AND c.isActive = false))")
+        Page<ClassResponseDTO> getListClass(@Param("includeArchived") Boolean includeArchived, Pageable pageable);
 
         @Transactional
         @Modifying
@@ -69,6 +74,6 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
         Optional<Classes> findByClassName(String className);
 
         @Query("SELECT NEW com.example.demo.examOnline.dto.response.ClassOptionResponse(c.classId, c.className) "
-                        + "FROM Classes c WHERE c.teacher.userId = :teacherId ORDER BY c.className ASC")
+                        + "FROM Classes c WHERE c.teacher.userId = :teacherId AND c.isActive = true ORDER BY c.className ASC")
         List<ClassOptionResponse> findClassOptionsByTeacherId(@Param("teacherId") Integer teacherId);
 }

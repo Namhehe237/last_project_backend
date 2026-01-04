@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class GetStudentClassesRequest {
     @NotNull(message = "Student ID không được để trống")
     private Integer studentId;
+    private Boolean includeArchived;
 }

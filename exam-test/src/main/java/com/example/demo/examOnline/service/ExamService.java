@@ -34,7 +34,7 @@ public interface ExamService {
 
         public ExamSnapshot getOrBuildExamSnapshot(Integer examId);
 
-        public ExamPaperResponse getExamPaper(Integer examId);
+        public ExamPaperResponse getExamPaper(Integer examId, Integer studentId);
 
         public GradeExamResponse gradeExam(SubmitExamRequest request);
 

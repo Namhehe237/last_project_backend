@@ -15,7 +15,7 @@ public interface AdminService {
 
     public void deleteUser(DeleteUserRequest request);
 
-    public Page<ClassResponseDTO> getClassList(Pageable pageable);
+    public Page<ClassResponseDTO> getClassList(Boolean includeArchived, Pageable pageable);
 
     public void addUser(CreateUserRequest request);
 

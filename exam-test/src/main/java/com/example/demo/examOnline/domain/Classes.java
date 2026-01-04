@@ -37,7 +37,7 @@ public class Classes {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher; // tham chiếu đến USERS
 
-    @Column(name = "is_active")
+    @Column(name = "is_active") // lưu trữ
     @Builder.Default
     private Boolean isActive = true;
 
